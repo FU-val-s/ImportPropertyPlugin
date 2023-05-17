@@ -1,0 +1,6 @@
+name = Frost import
+description = Custom Module for Frost Real Estate import
+core = 7.x
+package = "itsu"
+
+files[] = api.inc

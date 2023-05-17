@@ -1,0 +1,532 @@
+<?php
+
+function itsu_frost_menu(){
+  $items['testeo'] = array(
+    'title' => t('Test Page'),
+    'description' => t('Test'),
+    'access callback' => TRUE,
+    'page callback' => 'itsu_frost_test',
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+function frost_get_node_by_extid($ids){
+  if ( !is_array($ids) )
+    $ids = [$ids];
+  $query = new EntityFieldQuery();
+    $result = $query->entityCondition('entity_type', 'node')
+    ->propertyCondition('type', "real_estate")
+    ->propertyCondition('status', 1)
+    ->fieldCondition('field_external_id', 'value', $ids, 'in')
+    ->execute();
+  if (!empty($result['node'])) {
+    return array_keys($result['node']);
+  }else{
+    return false;
+  }
+}
+function frost_get_node_by_title($title){
+  $query = new EntityFieldQuery();
+    $result = $query->entityCondition('entity_type', 'node')
+    ->propertyCondition('type', "real_estate")
+    ->propertyCondition('status', 1)
+    ->propertyCondition('title', $title)
+    ->execute();
+  if (!empty($result['node'])) {
+    return array_keys($result['node']);
+  }else{
+    return false;
+  }
+}
+//
+function itsu_frost_test() {
+  global $user;
+  if ($user->uid == 74 ) {
+    print 'ARRANCA TEST<br><pre>';
+    //itsu_frost_deleted_real_estate(-720);
+    itsu_frost_syncro(120);
+  }
+  return 1;
+}
+function itsu_frost_cron() {
+  if ( date('H') == 2 ) {
+    watchdog('itsu_frost', 'Run 24 h cron', array(), WATCHDOG_INFO);
+    itsu_frost_import_real_estate(-24);
+    itsu_frost_deleted_real_estate(-24);
+  }
+  else {
+    itsu_frost_import_real_estate(-1);
+    itsu_frost_deleted_real_estate(-1);
+  }
+}
+function itsu_frost_syncro($limit) {
+  $data_arr = [
+    "current_localization_id"=>0,
+    "current_localization_type"=>"country",
+    "price_from"=>0,
+    "price_to"=>999999999,
+    "operation_types"=>[1,2,3],
+    "property_types"=>[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],
+    "currency"=>"ANY",
+    "filters"=>[]
+  ];
+  $data = json_decode(json_encode($data_arr));
+  $auth = new TokkoAuth(<code>);
+  // CREATE PROPERTY SEARCH OBJECT
+  $search = new TokkoSearch($auth);
+  $search->TokkoSearch($auth, $data);
+  //order_by=price&limit=20&order=desc&page=1&data='+JSON.stringify(data);
+  // ORDER BY, LIMIT, ORDER
+  //$search->do_search(500, 'deleted_at');
+  $search->do_search( $limit, 'deleted_at' );
+  date_default_timezone_set('UTC');
+  foreach ( $search->get_properties() as $propiedad_obj ) {
+    $propiedad = $propiedad_obj->data;
+    foreach ($propiedad->custom_tags as $tag) {
+      if ( $tag->id == 15445 ){
+        continue(2);
+      }
+    }
+    print '<pre>';
+    print_r($propiedad);
+    exit();
+    /*if ( !empty($propiedad->data->reference_code) && $node = node_load($propiedad->data->reference_code) ) {
+      $node->field_external_id['und']['0']['value'] = $propiedad->id;
+      node_save($node);
+      print "\nSE ACTUALIZA EXTERNAL: ".$node->nid;
+    }
+    else*/
+    if ( $node_ids = frost_get_node_by_extid([$propiedad->id])) {
+
+      //if ($node_ids[0] > 657) {
+        $node = node_load($node_ids[0]);
+        if ( empty($node->field_numero['und']) || $node->field_numero['und']['0']['value'] == '' ) {
+          //$node->field_external_id['und']['0']['value'] = $propiedad->id;
+          $node->field_numero['und'][0]['value'] = $propiedad->real_address;
+          node_save($node);
+          print "\nSE ACTUALIZA NOMBRE ".$node->nid;
+        } //print_r($node_ids);
+      //}
+    }
+  }
+  exit();
+}
+
+function itsu_frost_deleted_real_estate($from) {
+  $data = json_decode(json_encode($data_arr));
+  $auth = new TokkoAuth(<code>);
+  // CREATE PROPERTY SEARCH OBJECT
+  $from_date = date('Y-m-d%20H:i', strtotime( $from.' hour' ));
+  $search = new TokkoInactiveProperty($from_date, $auth);
+  if ( !empty( $externals = $search->get_properties() ) ) {
+    $nids = frost_get_node_by_extid($externals);
+    if ( $nids ) {
+      $i = 0;
+      foreach ($nids as $nid) {
+        try {
+          $property = node_load($nid);
+          $property->status = 0;
+          node_save($property);
+          $i++;
+        }
+        catch (Exception $e) {
+          watchdog('itsu_frost', 'Error al despublicar propiedad: '+$nid.' '.$e->getMessage(), array(), WATCHDOG_ERROR);
+        }
+      }
+      watchdog('itsu_frost', 'Se detectaron '.sizeof($externals).' que matchearon'.sizeof($nids).' propiedades borradas desde '.$from_date.' se despublicaron '.$i, array(), WATCHDOG_INFO);
+    }
+    else {
+      watchdog('itsu_frost', 'Se detectaron '.sizeof($externals).'. No se encontraron matcheos desde '.$from_date, array(), WATCHDOG_INFO);
+    }
+  }
+  return 1;
+}
+//
+function itsu_frost_import_real_estate($from){
+  //node_delete_multiple( array_keys(node_load_multiple(array(), array('type' => 'real_estate'))) );
+  //$nodes = node_load_multiple(array(), array('type' => 'cpcs'));
+  $data_arr = [
+    "current_localization_id"=>0,
+    "current_localization_type"=>"country",
+    "price_from"=>0,
+    "price_to"=>999999999,
+    "operation_types"=>[1,2,3],
+    "property_types"=>[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],
+    "currency"=>"ANY",
+    "filters"=>[]
+  ];
+  $data = json_decode(json_encode($data_arr));
+  $auth = new TokkoAuth(<code>);
+  // CREATE PROPERTY SEARCH OBJECT
+  $search = new TokkoSearch($auth);
+  $search->TokkoSearch($auth, $data);
+  //order_by=price&limit=20&order=desc&page=1&data='+JSON.stringify(data);
+  // ORDER BY, LIMIT, ORDER
+  $search->do_search(20, 'deleted_at');
+  date_default_timezone_set('UTC');
+  foreach ( $search->get_properties() as $propiedad_obj ) {
+    //check only last hour
+    $propiedad = $propiedad_obj->data;
+    //print_r($propiedad);
+    //print "\n Property TIME: ".strtotime( $propiedad->deleted_at )." \n\n";
+    if ( strtotime( $propiedad->deleted_at ) < strtotime( $from.' hour' ) ) {
+      watchdog('itsu_frost', 'No hay mas propiedades para importar: '.$propiedad->deleted_at, array(), WATCHDOG_INFO);
+      break;
+    }
+    else {
+      foreach ($propiedad->custom_tags as $tag) {
+        if ( $tag->id == 15445 ){
+          continue(2);
+        }
+      }
+      watchdog('itsu_frost', 'Importing tokko property: '.$propiedad->id, array(), WATCHDOG_INFO);
+    }
+    $node = 0;
+    if ( !($node = frost_get_node_by_extid([$propiedad->id])) ){
+      //Assign external_id sólo primera vez
+      if ( !empty($propiedad->reference_code) ) {
+        $node = node_load($propiedad->reference_code);
+      }
+      else {
+        if ( $node = frost_get_node_by_title($propiedad->fake_address) ){
+          $node = node_load($node['0']);
+        }
+      }
+    }
+    else {
+      $node = node_load($node['0']);
+    }
+    itsu_frost_create_real_state_node($propiedad, $node);
+  }
+  return 1;
+}
+//
+function populate_features_collection($propiedad, $fc_features){
+  $tags = [];
+  foreach ($propiedad->tags as $tag_obj) {
+    $tags[] = $tag_obj->id;
+  }
+  foreach ($propiedad->custom_tags as $tag_obj) {
+    $tags[] = $tag_obj->id;
+  }
+  //$tags = array_column($propiedad->tags, 'id');
+  watchdog('itsu_frost', 'TAGS: '.print_r($tags, TRUE), array(), WATCHDOG_ALERT);
+  if ( array_search( 20, $tags) )
+    $fc_features->field_real_laundry['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_laundry['und']['0']['value'] = 0;
+  if ( array_search( 1545, $tags) )
+    $fc_features->field_real_garage['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_garage['und']['0']['value'] = 0;
+  if ( array_search( 35, $tags) )
+    $fc_features->field_real_barbacoa['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_barbacoa['und']['0']['value'] = 0;
+  if ( array_search( 38, $tags) )
+    $fc_features->field_real_sala_de_juegos['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_sala_de_juegos['und']['0']['value'] = 0;
+  if ( array_search( 1612, $tags) )
+    $fc_features->field_real_servicio_de_mucama['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_servicio_de_mucama['und']['0']['value'] = 0;
+  if ( array_search( 51, $tags) )
+    $fc_features->field_real_pileta_externa['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_pileta_externa['und']['0']['value'] = 0;
+  if ( array_search( 39, $tags) )
+    $fc_features->field_real_sauna['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_sauna['und']['0']['value'] = 0;
+  if ( array_search( 33, $tags) )
+    $fc_features->field_real_gimnasio['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_gimnasio['und']['0']['value'] = 0;
+  if ( array_search( 1518, $tags) )
+    $fc_features->field_real_seguridad['und']['0']['value'] = 1;
+  else
+   $fc_features->field_real_seguridad['und']['0']['value'] = 0;
+  if ( array_search( 1524, $tags) )
+    $fc_features->field_real_porteria_24_hrs['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_porteria_24_hrs['und']['0']['value'] = 0;
+  if ( array_search( 1630, $tags) )
+    $fc_features->field_real_garagista['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_garagista['und']['0']['value'] = 0;
+  if ( array_search( 1557, $tags) )
+    $fc_features->field_real_sala_de_cine['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_sala_de_cine['und']['0']['value'] = 0;
+  if ( array_search( 34, $tags) )
+    $fc_features->field_real_jacuzzi['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_jacuzzi['und']['0']['value'] = 0;
+  if ( array_search( 164, $tags) )
+    $fc_features->field_real_pileta_inter['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_pileta_inter['und']['0']['value'] = 0;
+  if ( array_search( 14790, $tags ) )
+    $fc_features->field_real_sala_de_masajes['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_sala_de_masajes['und']['0']['value'] = 0;
+  if ( array_search( 14782, $tags ) )
+    $fc_features->field_real_features_pileta_inter['und']['0']['value'] = 1;
+  else
+    $fc_features->field_real_features_pileta_inter['und']['0']['value'] = 0;
+  entity_save('field_collection_item', $fc_features);
+  return $fc_features;
+}
+//
+function itsu_frost_create_real_state_node($propiedad, $node = 0){
+  //print_r($propiedad);
+  if (!$node) {
+    $node = new stdClass();
+    $node->title = $propiedad->fake_address;
+    $node->type = "real_estate";
+    node_object_prepare($node);
+    $fc_features = entity_create('field_collection_item', array('field_name' => 'field_real_features'));
+    $fc_features->setHostEntity('node', $node);
+    $fc_map = entity_create('field_collection_item', array('field_name' => 'field_real_map'));
+    $fc_map->setHostEntity('node', $node);
+  }
+  else {
+    $fc_features = array_shift(entity_load('field_collection_item', array($node->field_real_features['und']['0']['value'])));
+    $fc_map = array_shift(entity_load('field_collection_item', array($node->field_real_map['und']['0']['value'])));
+  }
+  //Check occupation
+  if ( count($propiedad->occupation) )
+    itsu_frost_assign_ocupation($propiedad->occupation, $node);
+
+  $node->field_numero['und'][0]['value'] = $propiedad->real_address;
+  $node->field_external_id['und']['0']['value'] = $propiedad->id;
+
+  if ($fc_features)
+    $fc_features = populate_features_collection($propiedad, $fc_features);
+
+  if ($fc_map && !empty($propiedad->geo_lat)) {
+    $fc_map->field_real_map_latitude['und']['0']['value'] = $propiedad->geo_lat;
+    $fc_map->field_real_map_longitude['und']['0']['value'] = $propiedad->geo_long;
+    entity_save('field_collection_item', $fc_map);
+  }
+
+  //Load taxonomy by term name
+  if ( !empty($propiedad->location->name) ) {
+    if ( !empty($barrio = taxonomy_get_term_by_name($propiedad->location->name)) ) {
+      if ( count($barrio) > 1 ) {
+        foreach ($barrio as $tid => $b) {
+          if ( !empty($loc = taxonomy_get_parents($tid) ) ) {
+            $barrio = [$tid => 1];
+            break;
+          }
+        }
+      }
+      else {
+        $loc = taxonomy_get_parents(array_keys($barrio)[0]);
+      }
+      if ( !empty($loc) ) {
+        $node->field_real_location['und']['0']['tid'] = array_keys($loc)[0];
+        $node->field_real_sub_location['und']['0']['tid'] = array_keys($barrio)[0];
+      }
+      else {
+        watchdog('itsu_frost', 'NO EXISTE EL PADRE DEL BARRIO PARA ID TOKKO: '.$propiedad->id, array(), WATCHDOG_ALERT);
+      }
+    }
+    else {
+      watchdog('itsu_frost', 'NO EXISTE EL BARRIO PARA ID TOKKO: '.$propiedad->id, array(), WATCHDOG_ALERT);
+    }
+  }
+  else {
+    watchdog('itsu_frost', 'NO EXISTE NOMBRE DEL BARRIO PARA ID TOKKO: '.$propiedad->id, array(), WATCHDOG_ALERT);
+  }
+  if ( !empty($propiedad->description) )
+    $node->body['und']['0']['value'] = str_replace("&nbsp;", '', $propiedad->description);
+  if ( !empty($propiedad->total_surface) )
+    $node->field_real_area['und'][0]['value'] = $propiedad->total_surface;
+  if ( !empty($propiedad->surface) )
+    $node->field_real_lot_area['und'][0]['value'] = $propiedad->surface;
+  if ( !empty($propiedad->suite_amount) )
+    $node->field_real_bedrooms['und'][0]['value'] = $propiedad->suite_amount;
+  if ( !empty($propiedad->bathroom_amount) )
+    $node->field_real_bathrooms['und'][0]['value'] = $propiedad->bathroom_amount;
+  //Tipo: casa=61, chacra=64, departamento=62, terreno=63
+  switch ($propiedad->type->id) {
+    case '2':
+      $node->field_real_type['und'][0]['tid'] = 62;
+      break;
+    case '3':
+      $node->field_real_type['und'][0]['tid'] = 61;
+      break;
+    case '19':
+      $node->field_real_type['und'][0]['tid'] = 64;
+      break;
+    case '1':
+      $node->field_real_type['und'][0]['tid'] = 63;
+      break;
+  }
+  $node->field_real_status['und'] = array();
+  $node->field_real_price['und'] = array();
+  $node->field_alquiler_1ra_enero['und'] = array();
+  $node->field_alquiler_2da_enero['und'] = array();
+  $node->field_alquiler_enero['und'] = array();
+  $node->field_alquiler_1ra_febrero['und'] = array();
+  $node->field_alquiler_2da_febrero['und'] = array();
+  $node->field_alquiler_febrero['und'] = array();
+  foreach ($propiedad->operations as $operation) {
+    if ( $operation->operation_type == 'Sale' || $operation->operation_type == 'Venta' ) {
+      $node->field_real_price['und'][0]['value'] = $operation->prices[0]->price;
+      $node->field_real_status['und'][]['tid'] = 60;
+    }
+    else {
+      $node->field_real_status['und'][] = array('tid' => 59);
+      foreach ( $operation->prices as $rent ) {
+        switch ($rent->period) {
+          case '1st fortnight january':
+          case '1ra quincena de enero':
+            $node->field_alquiler_1ra_enero['und'][0]['value'] = $rent->price;
+          break;
+          case '2da quincena de enero':
+          case '2nd fortnight january':
+            $node->field_alquiler_2da_enero['und'][0]['value'] = $rent->price;
+          break;
+          case 'Enero':
+          case 'January':
+            $node->field_alquiler_enero['und'][0]['value'] = $rent->price;
+          break;
+          case '1ra quincena de febrero':
+          case '1st fortnight february':
+            $node->field_alquiler_1ra_febrero['und'][0]['value'] = $rent->price;
+          break;
+          case '2da quincena de febrero':
+          case '2nd fortnight february':
+            $node->field_alquiler_2da_febrero['und'][0]['value'] = $rent->price;
+          break;
+          case 'Febrero':
+          case 'February':
+            $node->field_alquiler_febrero['und'][0]['value'] = $rent->price;
+          break;
+        }
+      }
+    }
+  }
+  if ( !empty($propiedad->is_starred_on_web) )
+    $node->field_real_properties_featured['und'][0]['value'] = 1;
+
+  //Status tid->59=Alquiler, tid->60=Venta
+  $public = drupal_realpath('public://');
+  $node->field_real_gallery['und'] = array();
+  foreach ($propiedad->photos as $pi => $photo) {
+    $name_arr = explode('/', $photo->original);
+    $name = array_pop($name_arr);
+    //Check if file file_exists
+    $file_efq = new EntityFieldQuery();
+    $file_efq->entityCondition('entity_type', 'file')
+      ->propertyCondition('filename', $name);
+    $file_efq_result = $file_efq->execute();
+    if (!count($file_efq_result)) {
+      $file_raw = file_get_contents($photo->original);
+      if ($file_raw) {
+        if ( file_put_contents($public.'/'.$name, $file_raw) === FALSE) {
+          watchdog('itsu_frost', 'Error al crear foto de propiedad', array(), WATCHDOG_ERROR);
+          continue;
+        }
+        $file_size = filesize($public.'/'.$name);
+        //New file object
+        $file = new stdClass;
+        $file->uid = 1;
+        $file->filename = $name;
+        $file->uri = 'public://'.$name;
+        $file->filemime = file_get_mimetype('public://'.$name);
+        // Make it permanent, otherwise it will get deleted later.
+        $file->status = FILE_STATUS_PERMANENT;
+        // Save file object to make it a 'managed file'.
+        $file = file_save($file);
+      }
+    }
+    else {
+      $file = file_load(array_pop($file_efq_result['file'])->fid);
+    }
+    $fdesc = array(
+      'fid'  => $file->fid,
+      'uid'  => $file->uid,
+      'filename'  => $file->filename,
+      'uri'  => $file->uri,
+      'filemime'  => $file->filemime,
+      'filesize'  => $file->filesize,
+      'status'  => 1,
+      'display'  => 1,
+      'description'  => '',
+    );
+    switch ($pi) {
+      case 0:
+        $node->field_real_slider_image['und'][0] = $fdesc;
+        break;
+      case 1:
+        $node->field_real_thumbnail['und'][0] = $fdesc;
+        break;
+      default:
+        $node->field_real_gallery['und'][] = $fdesc;
+        break;
+    }
+  }
+  $node->status = 1;
+  //print_r($node);
+  node_save($node); //Comentado para evitar duplicados
+  watchdog('itsu_frost', 'Nodo actualizado/creado: '.$node->nid, array(), WATCHDOG_INFO);
+  return 1;
+}
+//
+function itsu_frost_assign_ocupation($occupation, &$node) {
+  $periods = [
+    [
+      "p_start" => strtotime((date("Y") + 1)."-01-01"),
+      "p_end" => strtotime((date("Y") + 1)."-01-15"),
+      "p_occ" => 'field_ocupada_1ra_enero'
+    ],
+    [
+      "p_start" => strtotime((date("Y") + 1)."-01-16"),
+      "p_end" => strtotime((date("Y") + 1)."-01-31"),
+      "p_occ" => 'field_ocupada_2da_enero'
+    ],
+    [
+      "p_start" => strtotime((date("Y") + 1)."-02-01"),
+      "p_end" => strtotime((date("Y") + 1)."-02-15"),
+      "p_occ" => 'field_ocupada_1ra_febrero'
+    ],
+    [
+      "p_start" => strtotime((date("Y") + 1)."-02-16"),
+      "p_end" => strtotime((date("Y") + 1)."-02-28"),
+      "p_occ" => 'field_ocupada_2da_febrero'
+    ],
+  ];
+  $node->field_ocupada_1ra_enero['und'][0]['value'] = 0;
+  $node->field_ocupada_2da_enero['und'][0]['value'] = 0;
+  $node->field_ocupada_enero['und'][0]['value'] = 0;
+  $node->field_ocupada_1ra_febrero['und'][0]['value'] = 0;
+  $node->field_ocupada_2da_febrero['und'][0]['value'] = 0;
+  $node->field_ocupada_febrero['und'][0]['value'] = 0;
+
+  foreach ( $occupation as $occ_period ) {
+    $occ_start = strtotime($occ_period->from);
+    $occ_end = strtotime($occ_period->to);
+    foreach ($periods as $period) {
+      extract($period);
+      if (
+        ( $occ_start >= $p_start && $occ_start <= $p_end ) ||
+        ( $occ_end >= $p_start && $occ_end <= $p_end ) ||
+        ( $occ_start <= $p_start && $occ_end >= $p_end )
+      ){
+        $node->$p_occ['und'][0]['value'] = 1;
+      }
+    }
+  }
+  if ( $node->field_ocupada_1ra_enero['und'][0]['value'] && $node->field_ocupada_2da_enero['und'][0]['value'] ) {
+    $node->field_ocupada_enero['und'][0]['value'] = 1;
+  }
+  if ( $node->field_ocupada_1ra_febrero['und'][0]['value'] && $node->field_ocupada_2da_febrero['und'][0]['value'] ) {
+    $node->field_ocupada_febrero['und'][0]['value'] = 1;
+  }
+}
+?>
