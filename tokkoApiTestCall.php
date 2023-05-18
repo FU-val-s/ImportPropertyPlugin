@@ -22,7 +22,7 @@ function getPropertyData() {
     $result = json_decode(curl_exec($ch));
     curl_close($ch);
 
-    //error_log(print_r($result,true));
+    error_log(print_r($result,true));
     return $result;
 }
 
