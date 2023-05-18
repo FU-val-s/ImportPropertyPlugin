@@ -1,13 +1,15 @@
 <?php
-// /wp-content/plugins/imporHouzezPlugin-main/class-fuvals-houzezImport.php
-class Fuvals_houzezImport
+
+// /wp-content/plugins/TokkoImportPlugin-main/class-fuvals-houzezImport.php
+//class that make connection with the api and transfer the results.
+class Fuvals_houzezImport_Tokko
 {
   public int $postId;
   //Connection data
-  public $apiUser = 'ATM';
-  public $apiKey = 'XFBIKJWXLEJLZGIP6NVDZOYTD';
+  public $apiUser = 'Test'; // for tokko?
+  public $apiKey = 'b87fe1d3b55263138083c53238333311c8046c81';
   // FIN - DATOS INMOBILIARIA //
-  public $apiUrl = 'http://xintel.com.ar/api/';
+  public $apiUrl = 'http://tokkobroker.com/api/v1/webcontact/?key=';
   public array $apiData;
   public $property;
   //CONSTRUCT
