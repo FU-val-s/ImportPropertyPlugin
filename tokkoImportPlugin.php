@@ -67,7 +67,7 @@ function fuvals_conciliate_properties() {
     'post_status' => 'publish',
     'numberposts' => -1
   ]);
-  $houzezImport = new Fuvals_houzezImport($agent, $conciliateImages);
+  $houzezImport = new Fuvals_houzezImport_Tokko($agent, $conciliateImages);
   foreach ($props as $property) {
     $delete = false;
     $ficha = get_post_meta($property->ID, 'fave_property_id', true);
@@ -100,7 +100,7 @@ function fuvals_get_last_properties($minval = false) {
   require_once(ABSPATH . 'wp-admin/includes/file.php');
   require_once(ABSPATH . 'wp-admin/includes/media.php');
   require_once(ABSPATH . 'wp-admin/includes/image.php');
-  $houzezImport = new Fuvals_houzezImport(0, true);
+  $houzezImport = new Fuvals_houzezImport_Tokko(0, true);
   $next = true;
   $i = 0;
   while ($next) {
@@ -140,18 +140,19 @@ function fuvals_get_last_properties($minval = false) {
   error_log("------END DEBUG------");
 }
 /*Function executed by Cron*/
-function import_houzez_properties($args)
+function import_houzez_properties()
 {
   //error_log("\nUPDATE OPTION: " . update_option( 'houzez_import_last_page', 0 ));
-  $first = $args[0] !== null ? $args[0] : get_option( 'houzez_import_last_page', 0 );
-  $pages = $args[1] !== null ? $args[1] : 1;
-  $agent = $args[2] ? $args[2] : 0;
-  $conciliateImages = $args[3] == 'false' ? false : true;
-  $minval = $args[4] ? $args[4] : false;//valor minimo
-  $filters = $args[5] ? $args[5] : [];
+  // $first = $args[0] !== null ? $args[0] : get_option( 'houzez_import_last_page', 0 );
+  // $pages = $args[1] !== null ? $args[1] : 1;
+  // $agent = $args[2] ? $args[2] : 0;
+  // $conciliateImages = $args[3] == 'false' ? false : true;
+  // $minval = $args[4] ? $args[4] : false;//valor minimo
+  // $filters = $args[5] ? $args[5] : [];
 
-  error_log("FILTERS: ".print_r($filters, true));
-  error_log("------START DEBUG------\n Desde: $first hasta $pages con agente: $agent --> OPERATION: $operation, Conciliate images: $conciliateImages");
+  // error_log("FILTERS: ".print_r($filters, true));
+  // error_log("------START DEBUG------\n Desde: $first hasta $pages con agente: $agent --> OPERATION: $operation, Conciliate images: $conciliateImages");
+  error_log("------START DEBUG------\n");
   set_time_limit(0);
   ini_set('max_execution_time', '-1');
   require_once(ABSPATH . 'wp-admin/includes/file.php');
@@ -170,24 +171,34 @@ function import_houzez_properties($args)
     createNewCustomFields();
   }
   // Import object
-  $houzezImport = new Fuvals_houzezImport($agent, $conciliateImages);
+  $houzezImport = new Fuvals_houzezImport_Tokko(0,false);
   //Get properties
-  $result = $houzezImport->get_valued_properties(0, $filters);
-  $limit = $result['resultado']['datos']['paginas'];
-  if ($pages) {
-    $limit = $pages + $first;
+  //$result = $houzezImport->get_valued_properties(0,[]);
+  $result = $houzezImport->callApi();
+  // $file = fopen('call.json', 'w');
+  // fwrite($file,print_r($result,true));
+  // fclose($file);
+  error_log("RESULT:" . print_r($result,true));
+  // $limit = $result['resultado']['datos']['paginas'];
+  // if ($pages) {
+  //   $limit = $pages + $first;
+  // }
+  //error_log("\n OBJECT OK \n Páginas:". print_r($result['resultado']['datos']['paginas'], true)."\n Hasta $limit\n");
+  ////$i = 0;
+  exit();
+  foreach ($result as $property){
+    //$houzezImport->process_property($property,$minval);
+    error_log("CHECK");
   }
-  error_log("\n OBJECT OK \n Páginas:". print_r($result['resultado']['datos']['paginas'], true)."\n Hasta $limit\n");
-  //$i = 0;
-  for ($i = $first; $i < $limit; $i++) {
-    $result = $houzezImport->get_valued_properties($i, $filters);
-    error_log("\n\nProcesando PÁGINA " . get_option( 'houzez_import_last_page', 0 )." de $limit");
-    error_log("\nFICHAS PÁGINA " . print_r($result['fichas'], true));
-    foreach ($result['fichas'] as $ficha) {
-      $houzezImport->process_property($ficha, $minval);
-    }
-    update_option('houzez_import_last_page', $i+1);
-  }
+  // for ($i = $first; $i < $limit; $i++) {
+  //   $result = $houzezImport->get_valued_properties($i, $filters);
+  //   error_log("\n\nProcesando PÁGINA " . get_option( 'houzez_import_last_page', 0 )." de $limit");
+  //   error_log("\nFICHAS PÁGINA " . print_r($result['fichas'], true));
+  //   foreach ($result['fichas'] as $ficha) {
+  //     $houzezImport->process_property($ficha, $minval);
+  //   }
+  //   update_option('houzez_import_last_page', $i+1);
+  // }
   error_log("------END DEBUG------");
 }
 
@@ -539,7 +550,7 @@ function fuvals_update_agent( $params ) {
     'meta_key' => 'fave_agents',
     'meta_value' => $from
   ]);
-  $houzezImport = new Fuvals_houzezImport($to, false);
+  $houzezImport = new Fuvals_houzezImport_Tokko($to, false);
   foreach ($props as $property) {
     //Get id
     error_log("Updating agent: $property->ID");

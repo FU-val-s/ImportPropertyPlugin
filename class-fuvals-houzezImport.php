@@ -2,11 +2,12 @@
 
 // /wp-content/plugins/TokkoImportPlugin-main/class-fuvals-houzezImport.php
 //class that make connection with the api and transfer the results.
+require plugin_dir_path(__FILE__) . '/api.inc';
 class Fuvals_houzezImport_Tokko
 {
   public int $postId;
-  //Connection data
-  public $apiUser = 'Test'; // for tokko?
+  //Connection data for tokko
+  public $apiUser = 'TokkoTest'; // for tokko?
   public $apiKey = 'b87fe1d3b55263138083c53238333311c8046c81';
   // FIN - DATOS INMOBILIARIA //
   public $apiUrl = 'http://tokkobroker.com/api/v1/webcontact/?key=';
@@ -32,13 +33,17 @@ class Fuvals_houzezImport_Tokko
       'property_area'
     ];
     foreach ($taxonomies as $taxonomy) {
-      $ops_objs = get_terms($taxonomy, array(
-        'hide_empty' => false,
-      ));
+      $ops_objs = get_terms(
+        $taxonomy,
+        array(
+          'hide_empty' => false,
+        )
+      );
       foreach ($ops_objs as $op) {
         $this->$taxonomy[$op->term_id] = $op->slug;
       }
     }
+    error_log('fuval initiated');
   }
   //
   public function clean_duplicates()
@@ -73,10 +78,10 @@ class Fuvals_houzezImport_Tokko
     error_log('Propiedad Setting terms: ' . $taxonomy);
     if (!empty($terms)) {
       $terms = is_array($terms) ? $terms : [$terms];
-      if ( $reload ) {
+      if ($reload) {
         $term_objs = wp_get_object_terms($this->postId, $taxonomy);
         foreach ($term_objs as $term) {
-          wp_remove_object_terms( $this->postId, $term->term_id, $taxonomy );
+          wp_remove_object_terms($this->postId, $term->term_id, $taxonomy);
         }
       }
       foreach ($terms as $term) {
@@ -96,8 +101,7 @@ class Fuvals_houzezImport_Tokko
         $termIds[] = $fid;
       }
       wp_set_object_terms($this->postId, $termIds, $taxonomy);
-    }
-    else {
+    } else {
       error_log('Propiedad Setting terms NO terms: ' . $taxonomy);
     }
     return;
@@ -113,11 +117,11 @@ class Fuvals_houzezImport_Tokko
     $postData = array(
       'post_date' => date('Y-m-d h:i:s'),
       'post_date_gmt' => date('Y-m-d h:i:s'),
-      'post_title'    => $this->property['titulo'],
-      'post_content'  => html_entity_decode($this->property['in_obs']),
-      'post_status'   => $status,
-      'post_type'     => $type,
-      'post_author'   => $authorId,
+      'post_title' => $this->property['titulo'],
+      'post_content' => html_entity_decode($this->property['in_obs']),
+      'post_status' => $status,
+      'post_type' => $type,
+      'post_author' => $authorId,
     );
     //Create property
     $this->postId = wp_insert_post($postData, true);
@@ -174,7 +178,8 @@ class Fuvals_houzezImport_Tokko
     return $this->callApi($data);
   }
   //
-  public function get_last_properties($i, $minval = false) {
+  public function get_last_properties($i, $minval = false)
+  {
     $data = array_merge(
       $this->apiData,
       array(
@@ -185,33 +190,34 @@ class Fuvals_houzezImport_Tokko
         'page' => $i,
       )
     );
-    if ( $minval != false ) {
+    if ($minval != false) {
       $data['valor_minimo'] = $minval;
     }
     return $this->callApi($data);
   }
-  public function process_property($ficha, $minval = false) {
+  public function process_property($ficha, $minval = false)
+  {
     global $wpdb;
     $table_houzez_data = $wpdb->prefix . "postmeta";
     error_log("Procesando propiedad " . $ficha);
     //Valido si ya existe
     $apiData = $this->property_details($ficha);
     error_log("Detalis propiedad fetched ");
-    if ( isset($apiData['resultado']['ficha'][0]) ) {
+    if (isset($apiData['resultado']['ficha'][0])) {
       $this->property = $apiData['resultado']['ficha'][0];
       //Property images array
       $propertyImg = $apiData['resultado']['img'];
-      if ( isset($apiData['resultado']['plano']) && !empty($apiData['resultado']['plano']) )
+      if (isset($apiData['resultado']['plano']) && !empty($apiData['resultado']['plano']))
         $propertyImg[] = $apiData['resultado']['plano'];
       //Property features array
       $propertyFeatures = $apiData['resultado']['caracteristicas_generales_personalizadas'];
       //Get property
-      error_log("Getting property in DB: ".$this->property['in_fic']);
+      error_log("Getting property in DB: " . $this->property['in_fic']);
       $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $this->property['in_fic'] . "'");
       //Check if property is active
-      if ( $this->property['in_int'] == 'True' && ( empty($this->property['in_esi']) || $this->property['in_esi'] == 'N' ) ) {
-        if ( $minval && ( empty($this->property['in_val']) || $this->property['in_val'] < $minval ) ) {
-          error_log("Skipping Property MIN VAL: ".$this->property['in_val']);
+      if ($this->property['in_int'] == 'True' && (empty($this->property['in_esi']) || $this->property['in_esi'] == 'N')) {
+        if ($minval && (empty($this->property['in_val']) || $this->property['in_val'] < $minval)) {
+          error_log("Skipping Property MIN VAL: " . $this->property['in_val']);
           return;
         }
         error_log("Processing Property");
@@ -221,8 +227,7 @@ class Fuvals_houzezImport_Tokko
           //Create property
           error_log("Create property");
           $this->postId = $this->create_property();
-        }
-        else {
+        } else {
           //Search property last modified date
           $new = false;
           //Clean properties
@@ -241,7 +246,7 @@ class Fuvals_houzezImport_Tokko
             'post_title' => $this->property['titulo'],
             'post_content' => html_entity_decode($this->property['in_obs']),
           );
-          wp_update_post( $data );
+          wp_update_post($data);
           error_log("Actulizados título y desc:" . $this->postId);
         }
         //Assign agent
@@ -266,19 +271,18 @@ class Fuvals_houzezImport_Tokko
         update_post_meta($this->postId, 'fave_property_rooms', $this->property['ambientes']);
         update_post_meta($this->postId, 'fave_property_garage', $this->property['garage']);
         //Add video
-        if ( !empty($this->property['in_vid']) )
-        update_post_meta($this->postId, 'fave_video_url', $this->property['in_vid']);
+        if (!empty($this->property['in_vid']))
+          update_post_meta($this->postId, 'fave_video_url', $this->property['in_vid']);
         //Type of unity conditional
-        if ( !empty($this->property['tipo_medida']) || $this->property['in_tip'] == 'Campo' || $this->property['in_tip'] == 'Chacra' ) {
-          if ( $this->property['in_tip'] == 'Campo' || $this->property['in_tip'] == 'Chacra' ) {
+        if (!empty($this->property['tipo_medida']) || $this->property['in_tip'] == 'Campo' || $this->property['in_tip'] == 'Chacra') {
+          if ($this->property['in_tip'] == 'Campo' || $this->property['in_tip'] == 'Chacra') {
             update_post_meta($this->postId, 'fave_property_land_postfix', 'HAS');
             update_post_meta($this->postId, 'fave_property_size_prefix', 'HAS');
-          }
-          else {
+          } else {
             update_post_meta($this->postId, 'fave_property_land_postfix', $this->property['tipo_medida']);
             update_post_meta($this->postId, 'fave_property_size_prefix', 'm²');
           }
-        }else{
+        } else {
           update_post_meta($this->postId, 'fave_property_land_postfix', 'm²');
           update_post_meta($this->postId, 'fave_property_size_prefix', 'm²');
         }
@@ -302,8 +306,8 @@ class Fuvals_houzezImport_Tokko
         //MOSTRAR STREET VIEW
         //update_post_meta($this->postId, 'fave_property_map_street_view', $this->property['dormitorios']);
         //VIRTUAL TOUR 360
-        if ( !empty($this->property['in_tou']) ) {
-          update_post_meta($this->postId, 'fave_virtual_tour', "<iframe src='".$this->property['in_tou']."'></iframe>");
+        if (!empty($this->property['in_tou'])) {
+          update_post_meta($this->postId, 'fave_virtual_tour', "<iframe src='" . $this->property['in_tou'] . "'></iframe>");
         }
 
         //FEATURES
@@ -315,56 +319,53 @@ class Fuvals_houzezImport_Tokko
           loadThumbProperty($this->postId, $this->property['img_princ']);
           loadImgProperty($this->postId, $propertyImg);
           //oldLoadImgProperty($this->postId, $this->property['img_princ'], $propertyImg, $this->property['in_fic']);
-        }
-        elseif ( $this->conciliateImages ) {
+        } elseif ($this->conciliateImages) {
           //if ( !fuvalsHI_conciliateThumb($this->postId, $this->property['img_princ']) ) {
-            error_log('ERRORES en thumb... reloading');
-            if ( !loadThumbProperty($this->postId, $this->property['img_princ'], true) ) {
-              error_log('ERRORES IN RELOADING THUMB');
-            }
+          error_log('ERRORES en thumb... reloading');
+          if (!loadThumbProperty($this->postId, $this->property['img_princ'], true)) {
+            error_log('ERRORES IN RELOADING THUMB');
+          }
           //}
           //if ( !fuvalsHI_conciliateImages($this->postId, $propertyImg, $this->property['img_princ']) ) {
-            error_log('ERRORES in images... reloading');
-            if ( !loadImgProperty($this->postId, $propertyImg, true) ) {
-              error_log('ERRORES IN RELOADING IMGS');
-            }
+          error_log('ERRORES in images... reloading');
+          if (!loadImgProperty($this->postId, $propertyImg, true)) {
+            error_log('ERRORES IN RELOADING IMGS');
+          }
           //}
         }
-        wp_update_post( ['ID' => $this->postId] );
+        wp_update_post(['ID' => $this->postId]);
         error_log('TERMINAMOS DE LEVANTAR LOS DATOS E IMAGENES');
-      }
-      else {
+      } else {
         error_log("La propiedad no está para publicar: $ficha");
         // La borramos si no está
-        if ( !empty($postIdQ) ) {
+        if (!empty($postIdQ)) {
           foreach ($postIdQ as $post) {
             wp_delete_post($post->post_id);
             error_log("Se ha eliminado el post:" . $post->post_id);
           }
         }
       }
-    }
-    else {
+    } else {
       error_log("NO SE PUDO OBTENER DETALLE DE LA FICHA: $ficha");
     }
   }
   //
-  public function assign_agent() {
+  public function assign_agent()
+  {
     if ($this->agent) {
       error_log("Adding agent:" . $this->agent);
       update_post_meta($this->postId, 'fave_agent_display_option', 'agent_info');
       update_post_meta($this->postId, 'fave_agents', $this->agent);
-    }
-    else {
-      $agent_name = $this->property['vendedor_nombre'].' '.$this->property['vendedor_apellido'];
+    } else {
+      $agent_name = $this->property['vendedor_nombre'] . ' ' . $this->property['vendedor_apellido'];
       //$agent_name = 'Fernando Uval';
       $args = array(
-      'post_type' => 'houzez_agent',
-      'post_status' => 'publish',
-      'posts_per_page' => 1,
-      'title' => $agent_name,
+        'post_type' => 'houzez_agent',
+        'post_status' => 'publish',
+        'posts_per_page' => 1,
+        'title' => $agent_name,
       );
-      $loop = new WP_Query( $args );
+      $loop = new WP_Query($args);
 
       if ($loop->have_posts()) {
         $loop->the_post();
@@ -376,9 +377,10 @@ class Fuvals_houzezImport_Tokko
     }
   }
   /*
-  *
-  */
-  public function loadCustomFields() {
+   *
+   */
+  public function loadCustomFields()
+  {
     error_log("Load Custom fields");
     update_post_meta($this->postId, 'fave_anio_construccion', $this->property['in_anio']);
     update_post_meta($this->postId, 'fave_antiguedad', $this->property['in_ant']);
@@ -390,18 +392,18 @@ class Fuvals_houzezImport_Tokko
     update_post_meta($this->postId, 'fave_tipo_prop', $this->property['in_tpr']);
     update_post_meta($this->postId, 'fave_ubicacion', $this->property['ubicacion']);
     update_post_meta($this->postId, 'fave_categoria', $this->property['in_eco']);
-    if ( !empty($this->property['in_exp']) ) {
+    if (!empty($this->property['in_exp'])) {
       $moe = $this->property['in_moe'] == 'D' ? 'USD' : '$';
-      update_post_meta($this->postId, 'fave_expensas', $this->property['in_exp'].' '.$moe);
+      update_post_meta($this->postId, 'fave_expensas', $this->property['in_exp'] . ' ' . $moe);
     }
-    if ( !empty($this->property['in_imp']) ) {
+    if (!empty($this->property['in_imp'])) {
       $impuesto = $this->property['moneda_impuesto'] == 'D' ? 'USD' : '$';
-      update_post_meta($this->postId, 'fave_impuesto', $this->property['in_imp'].' '.$impuesto);
+      update_post_meta($this->postId, 'fave_impuesto', $this->property['in_imp'] . ' ' . $impuesto);
     }
     update_post_meta($this->postId, 'fave_emprendimiento', $this->property['in_edi']);
     update_post_meta($this->postId, 'fave_cant_asc', $this->property['in_asc']);
-    update_post_meta($this->postId, 'fave_sup_cub', $this->property['in_cub'].'m²');
-    update_post_meta($this->postId, 'fave_sup_semi_cub', $this->property['sup_semicubierta'].'m²');
+    update_post_meta($this->postId, 'fave_sup_cub', $this->property['in_cub'] . 'm²');
+    update_post_meta($this->postId, 'fave_sup_semi_cub', $this->property['sup_semicubierta'] . 'm²');
     update_post_meta($this->postId, 'fave_nro_plant', $this->property['in_npi']);
     //update_post_meta($this->postId, 'fave_estado_of', $this->property['in_ale']);
     update_post_meta($this->postId, 'fave_zonific', $this->property['in_zon']);
@@ -412,11 +414,11 @@ class Fuvals_houzezImport_Tokko
     update_post_meta($this->postId, 'fave_ideal', $this->property['in_ide']);
     update_post_meta($this->postId, 'fave_rubro', $this->property['in_rub']);
     update_post_meta($this->postId, 'fave_frente', $this->property['in_pil']);
-    $activities = ['G' => 'Ganadería','A' => 'Agricultura','P' => 'Porcinos','C' => 'Apicultura','T' => 'Turístico','H' => 'Haras', 'F' => 'Forestación'];
+    $activities = ['G' => 'Ganadería', 'A' => 'Agricultura', 'P' => 'Porcinos', 'C' => 'Apicultura', 'T' => 'Turístico', 'H' => 'Haras', 'F' => 'Forestación'];
     delete_post_meta($post->ID, 'fave_actividades');
-    for ($i=1; $i <= 3; $i++) {
-      $act_sum = $this->property['in_ac'.$i];
-      if ( !empty( $act_sum ) ) {
+    for ($i = 1; $i <= 3; $i++) {
+      $act_sum = $this->property['in_ac' . $i];
+      if (!empty($act_sum)) {
         $activity = isset($activities[$act_sum]) ? $activities[$act_sum] : $act_sum;
         add_post_meta($this->postId, 'fave_actividades', $activity);
       }
@@ -424,7 +426,7 @@ class Fuvals_houzezImport_Tokko
     update_post_meta($this->postId, 'fave_valor_ha', $this->property['in_mt2']);
     update_post_meta($this->postId, 'fave_codigo_camp', $this->property['in_con']);
     update_post_meta($this->postId, 'fave_gas', $this->property['in_gas']);
-    if ( $this->property['in_tip'] == 'Departamento' || $this->property['in_tip'] == 'Apartamento' || $this->property['in_tip']=='Casa' ) {
+    if ($this->property['in_tip'] == 'Departamento' || $this->property['in_tip'] == 'Apartamento' || $this->property['in_tip'] == 'Casa') {
       update_post_meta($this->postId, 'fave_aire_acondicionado', $this->property['in_paq']);
     }
     //update_post_meta($this->postId, 'fave_riego', $this->property['in_rie']);
@@ -452,15 +454,15 @@ class Fuvals_houzezImport_Tokko
     $this->setPropertyTerms($othersFeatures, 'property_feature');
   }
   /*
-  */
-  public function update_price() {
-    if ( !empty($this->property['in_val']) ){
-      error_log("UPDATING sale PRICE: $this->postId --> ".$this->property['in_val']);
+   */
+  public function update_price()
+  {
+    if (!empty($this->property['in_val'])) {
+      error_log("UPDATING sale PRICE: $this->postId --> " . $this->property['in_val']);
       update_post_meta($this->postId, 'fave_property_price', $this->property['in_val']);
       update_post_meta($this->postId, 'fave_property_sec_price', $this->property['in_vaa']);
-    }
-    else {
-      error_log("UPDATING rent PRICE: $this->postId --> ".$this->property['in_vaa']);
+    } else {
+      error_log("UPDATING rent PRICE: $this->postId --> " . $this->property['in_vaa']);
       update_post_meta($this->postId, 'fave_property_price', $this->property['in_vaa']);
       update_post_meta($this->postId, 'fave_property_sec_price', 0);
     }
@@ -494,23 +496,58 @@ class Fuvals_houzezImport_Tokko
           break;
       }
       update_post_meta($this->postId, 'fave_property_price_postfix', $currencie . $period);
-    }
-    else {
+    } else {
       update_post_meta($this->postId, 'fave_property_price_postfix', '');
     }
   }
-  private function callApi($data)
+
+  public function callApi()
   {
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $this->apiUrl);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 120);
-    $result = json_decode(curl_exec($ch), true);
-    curl_close($ch);
-    //error_log('API RESULT: ' . $result);
+    //La funcion de curl esta hecha dentro de api.inc
+    //Funcion de prueba con la api de tokko.
+    //En el caso que funcione necesito ver el resto de los posibles filtros que puedo enviar.
+    //Filters for de call:
+    $data_arr = [
+      "current_localization_id" => 0,
+      "current_localization_type" => "country",
+      "price_from" => 0,
+      "price_to" => 999999999,
+      "operation_types" => [1, 2, 3],
+      "property_types" => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
+      "currency" => "ANY",
+      "filters" => []
+    ];
+    $data = json_decode(json_encode($data_arr));
+    $auth = new TokkoAuth('b87fe1d3b55263138083c53238333311c8046c81');
+    // CREATE PROPERTY SEARCH OBJECT
+    $search = new TokkoSearch($auth);
+    $search->TokkoSearch($auth, $data);
+    //order_by=price&limit=20&order=desc&page=1&data='+JSON.stringify(data);
+    // ORDER BY, LIMIT, ORDER
+    //$search->do_search(500, 'deleted_at');
+    $search->do_search(10, 'deleted_at');
+    date_default_timezone_set('UTC');
+    $result = $search->get_properties();
+    error_log("API CALL RESULT:" . print_r($result, true));
+    // $file = fopen('call1.json', 'w');
+    // fwrite($file,print_r($result,true));
+    // fclose($file);
     return $result;
   }
+
+  // private function callApi($data)
+  // {
+  //   $ch = curl_init();
+  //   curl_setopt($ch, CURLOPT_URL, $this->apiUrl);
+  //   curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+  //   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  //   curl_setopt($ch, CURLOPT_HEADER, 0);
+  //   curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+  //   $result = json_decode(curl_exec($ch), true);
+  //   curl_close($ch);
+  //   //error_log('API RESULT: ' . $result);
+  //   return $result;
+  // }
 }
+
 ?>

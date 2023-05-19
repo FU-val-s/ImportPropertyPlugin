@@ -4,6 +4,683 @@ Array
         (
             [data] => stdClass Object
                 (
+                    [address] => Primera linea en peninsula 
+                    [age] => 0
+                    [bathroom_amount] => 2
+                    [branch] => stdClass Object
+                        (
+                            [address] => Ruta 10 Km 181, La Juanita
+                            [alternative_phone] => 569777
+                            [alternative_phone_area] => 94
+                            [alternative_phone_country_code] => +598
+                            [alternative_phone_extension] => 
+                            [branch_type] => Internal
+                            [contact_time] => 10:00 a 19:00hs
+                            [created_date] => 2019-04-23T19:05:06
+                            [display_name] => Frost Real Estate
+                            [email] => info@frost.uy
+                            [geo_lat] => -34.83735628150845
+                            [geo_long] => -54.6650284
+                            [gm_location_type] => BY_HAND
+                            [id] => 12477
+                            [is_default] => 1
+                            [logo] => https://static.tokkobroker.com/logos/6979/39782424628471343501518354048957029332791760899280779189731627220291552224317.jpg
+                            [name] => Frost Real Estate
+                            [pdf_footer_text] => 
+                            [phone] => 97321500
+                            [phone_area] => 598
+                            [phone_country_code] => 
+                            [phone_extension] => 
+                            [use_pdf_footer] => 
+                        )
+
+                    [created_at] => 2023-05-16T15:49:49
+                    [custom1] => 0.00
+                    [custom_tags] => Array
+                        (
+                        )
+
+                    [deleted_at] => 2023-05-18T19:45:47
+                    [depth_measure] => 0.00
+                    [description] =>             Apartamento muy ubicado en primera linea en Peninsula.&nbsp;
+Amplio living/comedor luminoso, 3 dormitorios, 2 baños, cocina independiente con salida a parrillero cerrado, 2 jardines tanto hacia el frente como hacia atras. Dependencia de servicio con baño con entrada independiente. Porteria 24 hrs y garage.&nbsp;
+
+        
+
+.
+                    [development] => 
+                    [development_excel_extra_data] => []
+                    [disposition] => 
+                    [expenses] => 0
+                    [extra_attributes] => Array
+                        (
+                        )
+
+                    [fake_address] => Primera linea en peninsula 
+                    [files] => Array
+                        (
+                        )
+
+                    [floors_amount] => 0
+                    [front_measure] => 0.00
+                    [geo_lat] => -34.9632203
+                    [geo_long] => -54.9416744
+                    [gm_location_type] => ROOFTOP
+                    [has_temporary_rent] => 
+                    [id] => 5041469
+                    [is_denounced] => 
+                    [is_starred_on_web] => 
+                    [legally_checked] => Desconocido
+                    [location] => stdClass Object
+                        (
+                            [divisions] => Array
+                                (
+                                )
+
+                            [full_location] => Uruguay | Maldonado | Punta del Este | Península
+                            [id] => 52253
+                            [name] => Península
+                            [parent_division] => /api/v1/location/51330/
+                            [short_location] => Maldonado | Punta del Este | Península
+                            [state] => 
+                            [weight] => 4924
+                        )
+
+                    [occupation] => Array
+                        (
+                        )
+
+                    [operations] => Array
+                        (
+                            [0] => stdClass Object
+                                (
+                                    [operation_type] => Venta
+                                    [prices] => Array
+                                        (
+                                            [0] => stdClass Object
+                                                (
+                                                    [currency] => USD
+                                                    [period] => 0
+                                                    [price] => 300000
+                                                )
+
+                                        )
+
+                                )
+
+                        )
+
+                    [orientation] => 
+                    [parking_lot_amount] => 1
+                    [photos] => Array
+                        (
+                            [0] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/115372801819730501853103692104187058602432350522946110453396813328658352563276.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 1
+                                    [order] => 0
+                                    [original] => https://static.tokkobroker.com/original_pictures/115372801819730501853103692104187058602432350522946110453396813328658352563276.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/115372801819730501853103692104187058602432350522946110453396813328658352563276_thumb.jpg
+                                )
+
+                            [1] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/57259050963511694181130752581139923350784106288601551085154399539904680314246.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 1
+                                    [original] => https://static.tokkobroker.com/original_pictures/57259050963511694181130752581139923350784106288601551085154399539904680314246.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/57259050963511694181130752581139923350784106288601551085154399539904680314246_thumb.jpg
+                                )
+
+                            [2] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/26479680239840647008798685195160595196165290027652314273347168104584489881386.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 2
+                                    [original] => https://static.tokkobroker.com/original_pictures/26479680239840647008798685195160595196165290027652314273347168104584489881386.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/26479680239840647008798685195160595196165290027652314273347168104584489881386_thumb.jpg
+                                )
+
+                            [3] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/91685020447295838831927932409621972621549042950550260863722628021261514777772.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 3
+                                    [original] => https://static.tokkobroker.com/original_pictures/91685020447295838831927932409621972621549042950550260863722628021261514777772.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/91685020447295838831927932409621972621549042950550260863722628021261514777772_thumb.jpg
+                                )
+
+                            [4] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/97134758929331728247664210129344310918663413388414932484860488957166976822812.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 4
+                                    [original] => https://static.tokkobroker.com/original_pictures/97134758929331728247664210129344310918663413388414932484860488957166976822812.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/97134758929331728247664210129344310918663413388414932484860488957166976822812_thumb.jpg
+                                )
+
+                            [5] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/60250380276236079138589744079045442339301223272395089904070045044301029708125.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 5
+                                    [original] => https://static.tokkobroker.com/original_pictures/60250380276236079138589744079045442339301223272395089904070045044301029708125.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/60250380276236079138589744079045442339301223272395089904070045044301029708125_thumb.jpg
+                                )
+
+                            [6] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/101417067190173752540334167469948880116809262221177767381425294479220492938338.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 6
+                                    [original] => https://static.tokkobroker.com/original_pictures/101417067190173752540334167469948880116809262221177767381425294479220492938338.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/101417067190173752540334167469948880116809262221177767381425294479220492938338_thumb.jpg
+                                )
+
+                            [7] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/22140824566823179394053634011256441249458214162085198979191327809655010423744.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 7
+                                    [original] => https://static.tokkobroker.com/original_pictures/22140824566823179394053634011256441249458214162085198979191327809655010423744.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/22140824566823179394053634011256441249458214162085198979191327809655010423744_thumb.jpg
+                                )
+
+                            [8] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/71762647801578714182165487198845397180467164469400547647503845824882257054228.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 8
+                                    [original] => https://static.tokkobroker.com/original_pictures/71762647801578714182165487198845397180467164469400547647503845824882257054228.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/71762647801578714182165487198845397180467164469400547647503845824882257054228_thumb.jpg
+                                )
+
+                            [9] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/30978427761364746065691343921321372923901491725863708669469148418358739534020.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 9
+                                    [original] => https://static.tokkobroker.com/original_pictures/30978427761364746065691343921321372923901491725863708669469148418358739534020.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/30978427761364746065691343921321372923901491725863708669469148418358739534020_thumb.jpg
+                                )
+
+                            [10] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/51509483106367694726952848313345593740887555064416084421662401881336841275810.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 10
+                                    [original] => https://static.tokkobroker.com/original_pictures/51509483106367694726952848313345593740887555064416084421662401881336841275810.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/51509483106367694726952848313345593740887555064416084421662401881336841275810_thumb.jpg
+                                )
+
+                            [11] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/55367046931109854971928779863869116061606468973561984523925921959564979568795.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 11
+                                    [original] => https://static.tokkobroker.com/original_pictures/55367046931109854971928779863869116061606468973561984523925921959564979568795.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/55367046931109854971928779863869116061606468973561984523925921959564979568795_thumb.jpg
+                                )
+
+                            [12] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/46770080666388753429850715124517674205242312450118762406853500073707363085439.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 12
+                                    [original] => https://static.tokkobroker.com/original_pictures/46770080666388753429850715124517674205242312450118762406853500073707363085439.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/46770080666388753429850715124517674205242312450118762406853500073707363085439_thumb.jpg
+                                )
+
+                            [13] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/15373314724172145352604718531692665857272609312077922698582361110181450407161.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 13
+                                    [original] => https://static.tokkobroker.com/original_pictures/15373314724172145352604718531692665857272609312077922698582361110181450407161.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/15373314724172145352604718531692665857272609312077922698582361110181450407161_thumb.jpg
+                                )
+
+                            [14] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/108819203566613440634204719926686165806411174366403041961821406234977778302102.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 14
+                                    [original] => https://static.tokkobroker.com/original_pictures/108819203566613440634204719926686165806411174366403041961821406234977778302102.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/108819203566613440634204719926686165806411174366403041961821406234977778302102_thumb.jpg
+                                )
+
+                            [15] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/111499580450382292323797548945119836959307143154720584659210597378213516335585.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 15
+                                    [original] => https://static.tokkobroker.com/original_pictures/111499580450382292323797548945119836959307143154720584659210597378213516335585.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/111499580450382292323797548945119836959307143154720584659210597378213516335585_thumb.jpg
+                                )
+
+                            [16] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/95581856588689861913750881821055542435599778593495154848525842804339877040812.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 16
+                                    [original] => https://static.tokkobroker.com/original_pictures/95581856588689861913750881821055542435599778593495154848525842804339877040812.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/95581856588689861913750881821055542435599778593495154848525842804339877040812_thumb.jpg
+                                )
+
+                            [17] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/78567713978737983457146653616378983230626827707875620594396092591990634523856.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 17
+                                    [original] => https://static.tokkobroker.com/original_pictures/78567713978737983457146653616378983230626827707875620594396092591990634523856.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/78567713978737983457146653616378983230626827707875620594396092591990634523856_thumb.jpg
+                                )
+
+                        )
+
+                    [producer] => stdClass Object
+                        (
+                            [cellphone] => 
+                            [email] => mendive@frost.uy
+                            [id] => 22695
+                            [name] => Felipe Mendive
+                            [phone] => 097321500
+                            [picture] => https://static.tokkobroker.com/userprofile/pictures/35980455114271067475987021000380682878957313038683325726323469540422461883630
+                            [position] => 
+                        )
+
+                    [property_condition] => ---
+                    [public_url] => http://ficha.info/p/evjGbdf4dkGX9a
+                    [publication_title] => Apartamento en  venta de 3 dormitorios en Peninsula 
+                    [real_address] => Lobos 001
+                    [reference_code] => FAP5041469
+                    [rich_description] =>             <p>Apartamento muy ubicado en primera linea en Peninsula.&nbsp;</p><p>Amplio living/comedor luminoso, 3 dormitorios, 2 baños, cocina independiente con salida a parrillero cerrado, 2 jardines tanto hacia el frente como hacia atras. Dependencia de servicio con baño con entrada independiente. Porteria 24 hrs y garage.&nbsp;</p>
+        
+
+.
+                    [roofed_surface] => 89.00
+                    [room_amount] => 0
+                    [semiroofed_surface] => 0.00
+                    [situation] => ---
+                    [status] => 2
+                    [suite_amount] => 3
+                    [surface] => 0.00
+                    [surface_measurement] => M2
+                    [tags] => Array
+                        (
+                        )
+
+                    [toilet_amount] => 0
+                    [total_surface] => 89.00
+                    [transaction_requirements] => 
+                    [type] => stdClass Object
+                        (
+                            [code] => AP
+                            [id] => 2
+                            [name] => Departamento
+                        )
+
+                    [unroofed_surface] => 0.00
+                    [videos] => Array
+                        (
+                        )
+
+                    [web_price] => 1
+                    [zonification] => 
+                )
+
+            [BASE_URL] => http://www.tokkobroker.com/api/v1/property/
+        )
+
+    [1] => TokkoProperty Object
+        (
+            [data] => stdClass Object
+                (
+                    [address] => En peninsula cerca del mar 
+                    [age] => 0
+                    [bathroom_amount] => 2
+                    [branch] => stdClass Object
+                        (
+                            [address] => Ruta 10 Km 181, La Juanita
+                            [alternative_phone] => 569777
+                            [alternative_phone_area] => 94
+                            [alternative_phone_country_code] => +598
+                            [alternative_phone_extension] => 
+                            [branch_type] => Internal
+                            [contact_time] => 10:00 a 19:00hs
+                            [created_date] => 2019-04-23T19:05:06
+                            [display_name] => Frost Real Estate
+                            [email] => info@frost.uy
+                            [geo_lat] => -34.83735628150845
+                            [geo_long] => -54.6650284
+                            [gm_location_type] => BY_HAND
+                            [id] => 12477
+                            [is_default] => 1
+                            [logo] => https://static.tokkobroker.com/logos/6979/39782424628471343501518354048957029332791760899280779189731627220291552224317.jpg
+                            [name] => Frost Real Estate
+                            [pdf_footer_text] => 
+                            [phone] => 97321500
+                            [phone_area] => 598
+                            [phone_country_code] => 
+                            [phone_extension] => 
+                            [use_pdf_footer] => 
+                        )
+
+                    [created_at] => 2023-05-15T20:45:44
+                    [custom1] => 0.00
+                    [custom_tags] => Array
+                        (
+                        )
+
+                    [deleted_at] => 2023-05-18T14:28:12
+                    [depth_measure] => 0.00
+                    [description] => Lindo apartamento en venta en la Peninsula de 1 dormitorio y 2 baños. Living/comedor amplio, cocina y terraza con vista al mar. Garage con box. Reciclado.&nbsp;
+
+.
+                    [development] => 
+                    [development_excel_extra_data] => []
+                    [disposition] => 
+                    [expenses] => 4500
+                    [extra_attributes] => Array
+                        (
+                        )
+
+                    [fake_address] => En peninsula cerca del mar 
+                    [files] => Array
+                        (
+                        )
+
+                    [floors_amount] => 0
+                    [front_measure] => 0.00
+                    [geo_lat] => -34.9626772734
+                    [geo_long] => -54.9443191907
+                    [gm_location_type] => BY_HAND
+                    [has_temporary_rent] => 
+                    [id] => 5040103
+                    [is_denounced] => 
+                    [is_starred_on_web] => 
+                    [legally_checked] => Desconocido
+                    [location] => stdClass Object
+                        (
+                            [divisions] => Array
+                                (
+                                )
+
+                            [full_location] => Uruguay | Maldonado | Punta del Este | Península
+                            [id] => 52253
+                            [name] => Península
+                            [parent_division] => /api/v1/location/51330/
+                            [short_location] => Maldonado | Punta del Este | Península
+                            [state] => 
+                            [weight] => 4924
+                        )
+
+                    [occupation] => Array
+                        (
+                        )
+
+                    [operations] => Array
+                        (
+                            [0] => stdClass Object
+                                (
+                                    [operation_type] => Venta
+                                    [prices] => Array
+                                        (
+                                            [0] => stdClass Object
+                                                (
+                                                    [currency] => USD
+                                                    [period] => 0
+                                                    [price] => 153000
+                                                )
+
+                                        )
+
+                                )
+
+                        )
+
+                    [orientation] => 
+                    [parking_lot_amount] => 1
+                    [photos] => Array
+                        (
+                            [0] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/100473005317142232778121212144203280334217150453285177971782383956837970850069.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 1
+                                    [order] => 0
+                                    [original] => https://static.tokkobroker.com/original_pictures/100473005317142232778121212144203280334217150453285177971782383956837970850069.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/100473005317142232778121212144203280334217150453285177971782383956837970850069_thumb.jpg
+                                )
+
+                            [1] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/24747333013612711129339029255413501058633913124122972580111986216081468342563.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 1
+                                    [original] => https://static.tokkobroker.com/original_pictures/24747333013612711129339029255413501058633913124122972580111986216081468342563.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/24747333013612711129339029255413501058633913124122972580111986216081468342563_thumb.jpg
+                                )
+
+                            [2] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/60846857092433237468478246579943890492283595427882698028496291061604184629742.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 2
+                                    [original] => https://static.tokkobroker.com/original_pictures/60846857092433237468478246579943890492283595427882698028496291061604184629742.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/60846857092433237468478246579943890492283595427882698028496291061604184629742_thumb.jpg
+                                )
+
+                            [3] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/69557455494422615233469655503494768731845626664266379453122813135794641524904.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 3
+                                    [original] => https://static.tokkobroker.com/original_pictures/69557455494422615233469655503494768731845626664266379453122813135794641524904.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/69557455494422615233469655503494768731845626664266379453122813135794641524904_thumb.jpg
+                                )
+
+                            [4] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/71122874752732584028289019081717415720394364722591479597920274677515676130089.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 4
+                                    [original] => https://static.tokkobroker.com/original_pictures/71122874752732584028289019081717415720394364722591479597920274677515676130089.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/71122874752732584028289019081717415720394364722591479597920274677515676130089_thumb.jpg
+                                )
+
+                            [5] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/26756610302687389940392999096775005716493896920137822370460678818693597138089.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 5
+                                    [original] => https://static.tokkobroker.com/original_pictures/26756610302687389940392999096775005716493896920137822370460678818693597138089.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/26756610302687389940392999096775005716493896920137822370460678818693597138089_thumb.jpg
+                                )
+
+                            [6] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/97161962004671484990248315247208461555218336684824343956695853321891348481156.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 6
+                                    [original] => https://static.tokkobroker.com/original_pictures/97161962004671484990248315247208461555218336684824343956695853321891348481156.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/97161962004671484990248315247208461555218336684824343956695853321891348481156_thumb.jpg
+                                )
+
+                            [7] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/8922141565094493566077775064019036333679448634016086386438996972630742182441.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 7
+                                    [original] => https://static.tokkobroker.com/original_pictures/8922141565094493566077775064019036333679448634016086386438996972630742182441.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/8922141565094493566077775064019036333679448634016086386438996972630742182441_thumb.jpg
+                                )
+
+                            [8] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/90031999028192562120298526085446801365184523312689193367232463867893872073705.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 8
+                                    [original] => https://static.tokkobroker.com/original_pictures/90031999028192562120298526085446801365184523312689193367232463867893872073705.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/90031999028192562120298526085446801365184523312689193367232463867893872073705_thumb.jpg
+                                )
+
+                            [9] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/107663038785544450751839060432792511296761703165308920096447431475781331798093.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 9
+                                    [original] => https://static.tokkobroker.com/original_pictures/107663038785544450751839060432792511296761703165308920096447431475781331798093.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/107663038785544450751839060432792511296761703165308920096447431475781331798093_thumb.jpg
+                                )
+
+                            [10] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/16792125736080156078287854348483937391270826513745676863736325725907596219197.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 10
+                                    [original] => https://static.tokkobroker.com/original_pictures/16792125736080156078287854348483937391270826513745676863736325725907596219197.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/16792125736080156078287854348483937391270826513745676863736325725907596219197_thumb.jpg
+                                )
+
+                            [11] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/105883555482861843340351792124222287440641270167122248989228143010896638014371.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 11
+                                    [original] => https://static.tokkobroker.com/original_pictures/105883555482861843340351792124222287440641270167122248989228143010896638014371.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/105883555482861843340351792124222287440641270167122248989228143010896638014371_thumb.jpg
+                                )
+
+                            [12] => stdClass Object
+                                (
+                                    [description] => 
+                                    [image] => https://static.tokkobroker.com/pictures/34301643827787375821805462814663046568175953773201354749778240335175173372319.jpg
+                                    [is_blueprint] => 
+                                    [is_front_cover] => 
+                                    [order] => 12
+                                    [original] => https://static.tokkobroker.com/original_pictures/34301643827787375821805462814663046568175953773201354749778240335175173372319.jpg
+                                    [thumb] => https://static.tokkobroker.com/thumbs/34301643827787375821805462814663046568175953773201354749778240335175173372319_thumb.jpg
+                                )
+
+                        )
+
+                    [producer] => stdClass Object
+                        (
+                            [cellphone] => 
+                            [email] => mendive@frost.uy
+                            [id] => 22695
+                            [name] => Felipe Mendive
+                            [phone] => 097321500
+                            [picture] => https://static.tokkobroker.com/userprofile/pictures/35980455114271067475987021000380682878957313038683325726323469540422461883630
+                            [position] => 
+                        )
+
+                    [property_condition] => ---
+                    [public_url] => http://ficha.info/p/evjj9df4dkGM8a
+                    [publication_title] => Apartamento en venta de 2 dormitorios en Peninsula! 
+                    [real_address] => Da Vinci 306
+                    [reference_code] => FAP5040103
+                    [rich_description] => Lindo apartamento en venta en la Peninsula de 1 dormitorio y 2 baños. Living/comedor amplio, cocina y terraza con vista al mar. Garage con box. Reciclado.&nbsp;
+
+.
+                    [roofed_surface] => 0.00
+                    [room_amount] => 0
+                    [semiroofed_surface] => 0.00
+                    [situation] => ---
+                    [status] => 2
+                    [suite_amount] => 1
+                    [surface] => 0.00
+                    [surface_measurement] => M2
+                    [tags] => Array
+                        (
+                        )
+
+                    [toilet_amount] => 0
+                    [total_surface] => 58.00
+                    [transaction_requirements] => 
+                    [type] => stdClass Object
+                        (
+                            [code] => AP
+                            [id] => 2
+                            [name] => Departamento
+                        )
+
+                    [unroofed_surface] => 0.00
+                    [videos] => Array
+                        (
+                        )
+
+                    [web_price] => 1
+                    [zonification] => 
+                )
+
+            [BASE_URL] => http://www.tokkobroker.com/api/v1/property/
+        )
+
+    [2] => TokkoProperty Object
+        (
+            [data] => stdClass Object
+                (
                     [address] => Esturion Montoya
                     [age] => 0
                     [bathroom_amount] => 3
@@ -396,681 +1073,6 @@ Array
 
                     [toilet_amount] => 0
                     [total_surface] => 0.00
-                    [transaction_requirements] => 
-                    [type] => stdClass Object
-                        (
-                            [code] => AP
-                            [id] => 2
-                            [name] => Departamento
-                        )
-
-                    [unroofed_surface] => 0.00
-                    [videos] => Array
-                        (
-                        )
-
-                    [web_price] => 1
-                    [zonification] => 
-                )
-
-            [BASE_URL] => http://www.tokkobroker.com/api/v1/property/
-        )
-
-    [1] => TokkoProperty Object
-        (
-            [data] => stdClass Object
-                (
-                    [address] => Primera linea en peninsula 
-                    [age] => 0
-                    [bathroom_amount] => 2
-                    [branch] => stdClass Object
-                        (
-                            [address] => Ruta 10 Km 181, La Juanita
-                            [alternative_phone] => 569777
-                            [alternative_phone_area] => 94
-                            [alternative_phone_country_code] => +598
-                            [alternative_phone_extension] => 
-                            [branch_type] => Internal
-                            [contact_time] => 10:00 a 19:00hs
-                            [created_date] => 2019-04-23T19:05:06
-                            [display_name] => Frost Real Estate
-                            [email] => info@frost.uy
-                            [geo_lat] => -34.83735628150845
-                            [geo_long] => -54.6650284
-                            [gm_location_type] => BY_HAND
-                            [id] => 12477
-                            [is_default] => 1
-                            [logo] => https://static.tokkobroker.com/logos/6979/39782424628471343501518354048957029332791760899280779189731627220291552224317.jpg
-                            [name] => Frost Real Estate
-                            [pdf_footer_text] => 
-                            [phone] => 97321500
-                            [phone_area] => 598
-                            [phone_country_code] => 
-                            [phone_extension] => 
-                            [use_pdf_footer] => 
-                        )
-
-                    [created_at] => 2023-05-16T15:49:49
-                    [custom1] => 0.00
-                    [custom_tags] => Array
-                        (
-                        )
-
-                    [deleted_at] => 2023-05-16T16:05:04
-                    [depth_measure] => 0.00
-                    [description] => Apartamento muy ubicado en primera linea en Peninsula.&nbsp;
-Amplio living/comedor luminoso, 3 dormitorios, 2 baños, cocina independiente con salida a parrillero cerrado, 2 jardines tanto hacia el frente como hacia atras. Dependencia de servicio con baño con entrada independiente. Porteria 24 hrs y garage. Gastos comunes bajos!!&nbsp;
-
-
-.
-                    [development] => 
-                    [development_excel_extra_data] => []
-                    [disposition] => 
-                    [expenses] => 0
-                    [extra_attributes] => Array
-                        (
-                        )
-
-                    [fake_address] => Primera linea en peninsula 
-                    [files] => Array
-                        (
-                        )
-
-                    [floors_amount] => 0
-                    [front_measure] => 0.00
-                    [geo_lat] => -34.9632203
-                    [geo_long] => -54.9416744
-                    [gm_location_type] => ROOFTOP
-                    [has_temporary_rent] => 
-                    [id] => 5041469
-                    [is_denounced] => 
-                    [is_starred_on_web] => 
-                    [legally_checked] => Desconocido
-                    [location] => stdClass Object
-                        (
-                            [divisions] => Array
-                                (
-                                )
-
-                            [full_location] => Uruguay | Maldonado | Punta del Este | Península
-                            [id] => 52253
-                            [name] => Península
-                            [parent_division] => /api/v1/location/51330/
-                            [short_location] => Maldonado | Punta del Este | Península
-                            [state] => 
-                            [weight] => 4924
-                        )
-
-                    [occupation] => Array
-                        (
-                        )
-
-                    [operations] => Array
-                        (
-                            [0] => stdClass Object
-                                (
-                                    [operation_type] => Venta
-                                    [prices] => Array
-                                        (
-                                            [0] => stdClass Object
-                                                (
-                                                    [currency] => USD
-                                                    [period] => 0
-                                                    [price] => 300000
-                                                )
-
-                                        )
-
-                                )
-
-                        )
-
-                    [orientation] => 
-                    [parking_lot_amount] => 1
-                    [photos] => Array
-                        (
-                            [0] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/115372801819730501853103692104187058602432350522946110453396813328658352563276.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 1
-                                    [order] => 0
-                                    [original] => https://static.tokkobroker.com/original_pictures/115372801819730501853103692104187058602432350522946110453396813328658352563276.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/115372801819730501853103692104187058602432350522946110453396813328658352563276_thumb.jpg
-                                )
-
-                            [1] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/57259050963511694181130752581139923350784106288601551085154399539904680314246.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 1
-                                    [original] => https://static.tokkobroker.com/original_pictures/57259050963511694181130752581139923350784106288601551085154399539904680314246.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/57259050963511694181130752581139923350784106288601551085154399539904680314246_thumb.jpg
-                                )
-
-                            [2] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/26479680239840647008798685195160595196165290027652314273347168104584489881386.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 2
-                                    [original] => https://static.tokkobroker.com/original_pictures/26479680239840647008798685195160595196165290027652314273347168104584489881386.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/26479680239840647008798685195160595196165290027652314273347168104584489881386_thumb.jpg
-                                )
-
-                            [3] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/91685020447295838831927932409621972621549042950550260863722628021261514777772.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 3
-                                    [original] => https://static.tokkobroker.com/original_pictures/91685020447295838831927932409621972621549042950550260863722628021261514777772.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/91685020447295838831927932409621972621549042950550260863722628021261514777772_thumb.jpg
-                                )
-
-                            [4] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/97134758929331728247664210129344310918663413388414932484860488957166976822812.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 4
-                                    [original] => https://static.tokkobroker.com/original_pictures/97134758929331728247664210129344310918663413388414932484860488957166976822812.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/97134758929331728247664210129344310918663413388414932484860488957166976822812_thumb.jpg
-                                )
-
-                            [5] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/60250380276236079138589744079045442339301223272395089904070045044301029708125.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 5
-                                    [original] => https://static.tokkobroker.com/original_pictures/60250380276236079138589744079045442339301223272395089904070045044301029708125.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/60250380276236079138589744079045442339301223272395089904070045044301029708125_thumb.jpg
-                                )
-
-                            [6] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/101417067190173752540334167469948880116809262221177767381425294479220492938338.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 6
-                                    [original] => https://static.tokkobroker.com/original_pictures/101417067190173752540334167469948880116809262221177767381425294479220492938338.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/101417067190173752540334167469948880116809262221177767381425294479220492938338_thumb.jpg
-                                )
-
-                            [7] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/22140824566823179394053634011256441249458214162085198979191327809655010423744.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 7
-                                    [original] => https://static.tokkobroker.com/original_pictures/22140824566823179394053634011256441249458214162085198979191327809655010423744.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/22140824566823179394053634011256441249458214162085198979191327809655010423744_thumb.jpg
-                                )
-
-                            [8] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/71762647801578714182165487198845397180467164469400547647503845824882257054228.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 8
-                                    [original] => https://static.tokkobroker.com/original_pictures/71762647801578714182165487198845397180467164469400547647503845824882257054228.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/71762647801578714182165487198845397180467164469400547647503845824882257054228_thumb.jpg
-                                )
-
-                            [9] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/30978427761364746065691343921321372923901491725863708669469148418358739534020.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 9
-                                    [original] => https://static.tokkobroker.com/original_pictures/30978427761364746065691343921321372923901491725863708669469148418358739534020.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/30978427761364746065691343921321372923901491725863708669469148418358739534020_thumb.jpg
-                                )
-
-                            [10] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/51509483106367694726952848313345593740887555064416084421662401881336841275810.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 10
-                                    [original] => https://static.tokkobroker.com/original_pictures/51509483106367694726952848313345593740887555064416084421662401881336841275810.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/51509483106367694726952848313345593740887555064416084421662401881336841275810_thumb.jpg
-                                )
-
-                            [11] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/55367046931109854971928779863869116061606468973561984523925921959564979568795.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 11
-                                    [original] => https://static.tokkobroker.com/original_pictures/55367046931109854971928779863869116061606468973561984523925921959564979568795.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/55367046931109854971928779863869116061606468973561984523925921959564979568795_thumb.jpg
-                                )
-
-                            [12] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/46770080666388753429850715124517674205242312450118762406853500073707363085439.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 12
-                                    [original] => https://static.tokkobroker.com/original_pictures/46770080666388753429850715124517674205242312450118762406853500073707363085439.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/46770080666388753429850715124517674205242312450118762406853500073707363085439_thumb.jpg
-                                )
-
-                            [13] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/15373314724172145352604718531692665857272609312077922698582361110181450407161.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 13
-                                    [original] => https://static.tokkobroker.com/original_pictures/15373314724172145352604718531692665857272609312077922698582361110181450407161.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/15373314724172145352604718531692665857272609312077922698582361110181450407161_thumb.jpg
-                                )
-
-                            [14] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/108819203566613440634204719926686165806411174366403041961821406234977778302102.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 14
-                                    [original] => https://static.tokkobroker.com/original_pictures/108819203566613440634204719926686165806411174366403041961821406234977778302102.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/108819203566613440634204719926686165806411174366403041961821406234977778302102_thumb.jpg
-                                )
-
-                            [15] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/111499580450382292323797548945119836959307143154720584659210597378213516335585.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 15
-                                    [original] => https://static.tokkobroker.com/original_pictures/111499580450382292323797548945119836959307143154720584659210597378213516335585.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/111499580450382292323797548945119836959307143154720584659210597378213516335585_thumb.jpg
-                                )
-
-                            [16] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/95581856588689861913750881821055542435599778593495154848525842804339877040812.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 16
-                                    [original] => https://static.tokkobroker.com/original_pictures/95581856588689861913750881821055542435599778593495154848525842804339877040812.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/95581856588689861913750881821055542435599778593495154848525842804339877040812_thumb.jpg
-                                )
-
-                            [17] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/78567713978737983457146653616378983230626827707875620594396092591990634523856.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 17
-                                    [original] => https://static.tokkobroker.com/original_pictures/78567713978737983457146653616378983230626827707875620594396092591990634523856.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/78567713978737983457146653616378983230626827707875620594396092591990634523856_thumb.jpg
-                                )
-
-                        )
-
-                    [producer] => stdClass Object
-                        (
-                            [cellphone] => 
-                            [email] => mendive@frost.uy
-                            [id] => 22695
-                            [name] => Felipe Mendive
-                            [phone] => 097321500
-                            [picture] => https://static.tokkobroker.com/userprofile/pictures/35980455114271067475987021000380682878957313038683325726323469540422461883630
-                            [position] => 
-                        )
-
-                    [property_condition] => ---
-                    [public_url] => http://ficha.info/p/evjGbdf4dkGX9a
-                    [publication_title] => Apartamento en  venta de 3 dormitorios en Peninsula 
-                    [real_address] => Lobos 001
-                    [reference_code] => FAP5041469
-                    [rich_description] => <p>Apartamento muy ubicado en primera linea en Peninsula.&nbsp;</p><p>Amplio living/comedor luminoso, 3 dormitorios, 2 baños, cocina independiente con salida a parrillero cerrado, 2 jardines tanto hacia el frente como hacia atras. Dependencia de servicio con baño con entrada independiente. Porteria 24 hrs y garage. Gastos comunes bajos!!&nbsp;</p>
-
-.
-                    [roofed_surface] => 89.00
-                    [room_amount] => 0
-                    [semiroofed_surface] => 0.00
-                    [situation] => ---
-                    [status] => 2
-                    [suite_amount] => 3
-                    [surface] => 0.00
-                    [surface_measurement] => M2
-                    [tags] => Array
-                        (
-                        )
-
-                    [toilet_amount] => 0
-                    [total_surface] => 89.00
-                    [transaction_requirements] => 
-                    [type] => stdClass Object
-                        (
-                            [code] => AP
-                            [id] => 2
-                            [name] => Departamento
-                        )
-
-                    [unroofed_surface] => 0.00
-                    [videos] => Array
-                        (
-                        )
-
-                    [web_price] => 1
-                    [zonification] => 
-                )
-
-            [BASE_URL] => http://www.tokkobroker.com/api/v1/property/
-        )
-
-    [2] => TokkoProperty Object
-        (
-            [data] => stdClass Object
-                (
-                    [address] => En peninsula cerca del mar 
-                    [age] => 0
-                    [bathroom_amount] => 2
-                    [branch] => stdClass Object
-                        (
-                            [address] => Ruta 10 Km 181, La Juanita
-                            [alternative_phone] => 569777
-                            [alternative_phone_area] => 94
-                            [alternative_phone_country_code] => +598
-                            [alternative_phone_extension] => 
-                            [branch_type] => Internal
-                            [contact_time] => 10:00 a 19:00hs
-                            [created_date] => 2019-04-23T19:05:06
-                            [display_name] => Frost Real Estate
-                            [email] => info@frost.uy
-                            [geo_lat] => -34.83735628150845
-                            [geo_long] => -54.6650284
-                            [gm_location_type] => BY_HAND
-                            [id] => 12477
-                            [is_default] => 1
-                            [logo] => https://static.tokkobroker.com/logos/6979/39782424628471343501518354048957029332791760899280779189731627220291552224317.jpg
-                            [name] => Frost Real Estate
-                            [pdf_footer_text] => 
-                            [phone] => 97321500
-                            [phone_area] => 598
-                            [phone_country_code] => 
-                            [phone_extension] => 
-                            [use_pdf_footer] => 
-                        )
-
-                    [created_at] => 2023-05-15T20:45:44
-                    [custom1] => 0.00
-                    [custom_tags] => Array
-                        (
-                        )
-
-                    [deleted_at] => 2023-05-15T21:27:43
-                    [depth_measure] => 0.00
-                    [description] => Lindo apartamento en venta en la Peninsula de 1 dormitorio y 2 baños. Living/comedor amplio, cocina y terraza con vista al mar. Garage con box. Reciclado.&nbsp;
-
-.
-                    [development] => 
-                    [development_excel_extra_data] => []
-                    [disposition] => 
-                    [expenses] => 0
-                    [extra_attributes] => Array
-                        (
-                        )
-
-                    [fake_address] => En peninsula cerca del mar 
-                    [files] => Array
-                        (
-                        )
-
-                    [floors_amount] => 0
-                    [front_measure] => 0.00
-                    [geo_lat] => -34.9631169
-                    [geo_long] => -54.9446947
-                    [gm_location_type] => GEOMETRIC_CENTER
-                    [has_temporary_rent] => 
-                    [id] => 5040103
-                    [is_denounced] => 
-                    [is_starred_on_web] => 
-                    [legally_checked] => Desconocido
-                    [location] => stdClass Object
-                        (
-                            [divisions] => Array
-                                (
-                                )
-
-                            [full_location] => Uruguay | Maldonado | Punta del Este | Península
-                            [id] => 52253
-                            [name] => Península
-                            [parent_division] => /api/v1/location/51330/
-                            [short_location] => Maldonado | Punta del Este | Península
-                            [state] => 
-                            [weight] => 4924
-                        )
-
-                    [occupation] => Array
-                        (
-                        )
-
-                    [operations] => Array
-                        (
-                            [0] => stdClass Object
-                                (
-                                    [operation_type] => Venta
-                                    [prices] => Array
-                                        (
-                                            [0] => stdClass Object
-                                                (
-                                                    [currency] => USD
-                                                    [period] => 0
-                                                    [price] => 153000
-                                                )
-
-                                        )
-
-                                )
-
-                        )
-
-                    [orientation] => 
-                    [parking_lot_amount] => 1
-                    [photos] => Array
-                        (
-                            [0] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/100473005317142232778121212144203280334217150453285177971782383956837970850069.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 1
-                                    [order] => 0
-                                    [original] => https://static.tokkobroker.com/original_pictures/100473005317142232778121212144203280334217150453285177971782383956837970850069.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/100473005317142232778121212144203280334217150453285177971782383956837970850069_thumb.jpg
-                                )
-
-                            [1] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/24747333013612711129339029255413501058633913124122972580111986216081468342563.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 1
-                                    [original] => https://static.tokkobroker.com/original_pictures/24747333013612711129339029255413501058633913124122972580111986216081468342563.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/24747333013612711129339029255413501058633913124122972580111986216081468342563_thumb.jpg
-                                )
-
-                            [2] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/60846857092433237468478246579943890492283595427882698028496291061604184629742.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 2
-                                    [original] => https://static.tokkobroker.com/original_pictures/60846857092433237468478246579943890492283595427882698028496291061604184629742.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/60846857092433237468478246579943890492283595427882698028496291061604184629742_thumb.jpg
-                                )
-
-                            [3] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/69557455494422615233469655503494768731845626664266379453122813135794641524904.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 3
-                                    [original] => https://static.tokkobroker.com/original_pictures/69557455494422615233469655503494768731845626664266379453122813135794641524904.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/69557455494422615233469655503494768731845626664266379453122813135794641524904_thumb.jpg
-                                )
-
-                            [4] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/71122874752732584028289019081717415720394364722591479597920274677515676130089.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 4
-                                    [original] => https://static.tokkobroker.com/original_pictures/71122874752732584028289019081717415720394364722591479597920274677515676130089.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/71122874752732584028289019081717415720394364722591479597920274677515676130089_thumb.jpg
-                                )
-
-                            [5] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/26756610302687389940392999096775005716493896920137822370460678818693597138089.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 5
-                                    [original] => https://static.tokkobroker.com/original_pictures/26756610302687389940392999096775005716493896920137822370460678818693597138089.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/26756610302687389940392999096775005716493896920137822370460678818693597138089_thumb.jpg
-                                )
-
-                            [6] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/97161962004671484990248315247208461555218336684824343956695853321891348481156.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 6
-                                    [original] => https://static.tokkobroker.com/original_pictures/97161962004671484990248315247208461555218336684824343956695853321891348481156.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/97161962004671484990248315247208461555218336684824343956695853321891348481156_thumb.jpg
-                                )
-
-                            [7] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/8922141565094493566077775064019036333679448634016086386438996972630742182441.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 7
-                                    [original] => https://static.tokkobroker.com/original_pictures/8922141565094493566077775064019036333679448634016086386438996972630742182441.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/8922141565094493566077775064019036333679448634016086386438996972630742182441_thumb.jpg
-                                )
-
-                            [8] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/90031999028192562120298526085446801365184523312689193367232463867893872073705.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 8
-                                    [original] => https://static.tokkobroker.com/original_pictures/90031999028192562120298526085446801365184523312689193367232463867893872073705.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/90031999028192562120298526085446801365184523312689193367232463867893872073705_thumb.jpg
-                                )
-
-                            [9] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/107663038785544450751839060432792511296761703165308920096447431475781331798093.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 9
-                                    [original] => https://static.tokkobroker.com/original_pictures/107663038785544450751839060432792511296761703165308920096447431475781331798093.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/107663038785544450751839060432792511296761703165308920096447431475781331798093_thumb.jpg
-                                )
-
-                            [10] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/16792125736080156078287854348483937391270826513745676863736325725907596219197.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 10
-                                    [original] => https://static.tokkobroker.com/original_pictures/16792125736080156078287854348483937391270826513745676863736325725907596219197.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/16792125736080156078287854348483937391270826513745676863736325725907596219197_thumb.jpg
-                                )
-
-                            [11] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/105883555482861843340351792124222287440641270167122248989228143010896638014371.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 11
-                                    [original] => https://static.tokkobroker.com/original_pictures/105883555482861843340351792124222287440641270167122248989228143010896638014371.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/105883555482861843340351792124222287440641270167122248989228143010896638014371_thumb.jpg
-                                )
-
-                            [12] => stdClass Object
-                                (
-                                    [description] => 
-                                    [image] => https://static.tokkobroker.com/pictures/34301643827787375821805462814663046568175953773201354749778240335175173372319.jpg
-                                    [is_blueprint] => 
-                                    [is_front_cover] => 
-                                    [order] => 12
-                                    [original] => https://static.tokkobroker.com/original_pictures/34301643827787375821805462814663046568175953773201354749778240335175173372319.jpg
-                                    [thumb] => https://static.tokkobroker.com/thumbs/34301643827787375821805462814663046568175953773201354749778240335175173372319_thumb.jpg
-                                )
-
-                        )
-
-                    [producer] => stdClass Object
-                        (
-                            [cellphone] => 
-                            [email] => mendive@frost.uy
-                            [id] => 22695
-                            [name] => Felipe Mendive
-                            [phone] => 097321500
-                            [picture] => https://static.tokkobroker.com/userprofile/pictures/35980455114271067475987021000380682878957313038683325726323469540422461883630
-                            [position] => 
-                        )
-
-                    [property_condition] => ---
-                    [public_url] => http://ficha.info/p/evjj9df4dkGM8a
-                    [publication_title] => Apartamento en venta de 2 dormitorios en Peninsula! 
-                    [real_address] => Da Vinci 306
-                    [reference_code] => FAP5040103
-                    [rich_description] => Lindo apartamento en venta en la Peninsula de 1 dormitorio y 2 baños. Living/comedor amplio, cocina y terraza con vista al mar. Garage con box. Reciclado.&nbsp;
-
-.
-                    [roofed_surface] => 0.00
-                    [room_amount] => 0
-                    [semiroofed_surface] => 0.00
-                    [situation] => ---
-                    [status] => 2
-                    [suite_amount] => 1
-                    [surface] => 0.00
-                    [surface_measurement] => M2
-                    [tags] => Array
-                        (
-                        )
-
-                    [toilet_amount] => 0
-                    [total_surface] => 58.00
                     [transaction_requirements] => 
                     [type] => stdClass Object
                         (
