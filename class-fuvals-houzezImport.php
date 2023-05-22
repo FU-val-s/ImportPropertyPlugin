@@ -2,7 +2,7 @@
 
 // /wp-content/plugins/TokkoImportPlugin-main/class-fuvals-houzezImport.php
 //class that make connection with the api and transfer the results.
-require plugin_dir_path(__FILE__) . '/api.inc';
+require plugin_dir_path(__FILE__) . '/api.php';
 class Fuvals_houzezImport_Tokko
 {
   public int $postId;
@@ -199,27 +199,29 @@ class Fuvals_houzezImport_Tokko
   {
     global $wpdb;
     $table_houzez_data = $wpdb->prefix . "postmeta";
-    error_log("Procesando propiedad " . $ficha);
+    error_log("Procesando propiedad " . $ficha['id']);
     //Valido si ya existe
-    $apiData = $this->property_details($ficha);
+    //$apiData = $this->property_details($ficha);
     error_log("Detalis propiedad fetched ");
-    if (isset($apiData['resultado']['ficha'][0])) {
-      $this->property = $apiData['resultado']['ficha'][0];
+    if (isset($ficha)) {
+      $this->property = $ficha;
       //Property images array
-      $propertyImg = $apiData['resultado']['img'];
-      if (isset($apiData['resultado']['plano']) && !empty($apiData['resultado']['plano']))
-        $propertyImg[] = $apiData['resultado']['plano'];
+      $propertyImg = $ficha['photos'];
       //Property features array
-      $propertyFeatures = $apiData['resultado']['caracteristicas_generales_personalizadas'];
+      $propertyFeatures = $ficha['tags'];
+      //Additional features
+      if(isset($ficha['custom_tags'])){
+        $propertyFeatures[] = $ficha['custom_tags'];
+      }
       //Get property
       error_log("Getting property in DB: " . $this->property['in_fic']);
-      $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $this->property['in_fic'] . "'");
+      $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $this->property['id'] . "'");
       //Check if property is active
-      if ($this->property['in_int'] == 'True' && (empty($this->property['in_esi']) || $this->property['in_esi'] == 'N')) {
-        if ($minval && (empty($this->property['in_val']) || $this->property['in_val'] < $minval)) {
-          error_log("Skipping Property MIN VAL: " . $this->property['in_val']);
-          return;
-        }
+      // if ($this->property['in_int'] == 'True' && (empty($this->property['in_esi']) || $this->property['in_esi'] == 'N')) {
+      //   if ($minval && (empty($this->property['in_val']) || $this->property['in_val'] < $minval)) {
+      //     error_log("Skipping Property MIN VAL: " . $this->property['in_val']);
+      //     return;
+      //   }
         error_log("Processing Property");
         //error_log(print_r($posts,true));
         if (empty($postIdQ)) {
@@ -249,19 +251,19 @@ class Fuvals_houzezImport_Tokko
           wp_update_post($data);
           error_log("Actulizados título y desc:" . $this->postId);
         }
-        //Assign agent
-        error_log("Asignando agente: $this->agent");
-        $this->assign_agent();
+        // //Assign agent
+        // error_log("Asignando agente: $this->agent");
+        // $this->assign_agent();
         //PROPERTY ID
-        update_post_meta($this->postId, 'fave_property_id', $this->property['in_fic']);
+        update_post_meta($this->postId, 'fave_property_id', $this->property['id']);
         //PROPERTY TYPE
-        $this->setPropertyTerms($this->property['in_tip'], 'property_type');
+        $this->setPropertyTerms($this->property['type']['name'], 'property_type');
         //PROPERTY CUSTOM FIELDS
         $this->loadCustomFields();
         //Set PROPERTY OPERATION TYPE
-        $this->setOperationType($this->property['in_ope']);
+        //$this->setOperationType($this->property['in_ope']);
         //PRICE with currencie already set.
-        $this->update_price();
+        //$this->update_price();
         //PRICE AND CURRENCIE FOR RENT
         error_log("Create property: main data updated");
         //ROOMS AND SIZES
@@ -526,9 +528,9 @@ class Fuvals_houzezImport_Tokko
     // ORDER BY, LIMIT, ORDER
     //$search->do_search(500, 'deleted_at');
     $search->do_search(10, 'deleted_at');
-    date_default_timezone_set('UTC');
+    //date_default_timezone_set('UTC');
     $result = $search->get_properties();
-    error_log("API CALL RESULT:" . print_r($result, true));
+    //error_log("API CALL RESULT:" . print_r($result, true));
     // $file = fopen('call1.json', 'w');
     // fwrite($file,print_r($result,true));
     // fclose($file);
