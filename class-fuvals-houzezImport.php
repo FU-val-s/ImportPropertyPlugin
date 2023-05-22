@@ -50,27 +50,7 @@ class Fuvals_houzezImport_Tokko
   {
   }
   //
-  public function setOperationType($propOp)
-  {
-    switch ($propOp) {
-      case 'A':
-        $tid = array_search('alquileres-anuales', $this->property_status);
-        break;
-      case 'V':
-        $tid = array_search('venta', $this->property_status);
-        break;
-      case 'T':
-        $tid = array_search('alquileres-temporarios', $this->property_status);
-        break;
-      case 'B':
-        $tid = [array_search('alquileres-temporarios', $this->property_status), array_search('venta', $this->property_status)];
-        break;
-      default:
-        $tid = [array_search('alquileres-anuales', $this->property_status), array_search('venta', $this->property_status)];
-        break;
-    }
-    wp_set_object_terms($this->postId, $tid, 'property_status');
-  }
+
   //
   public function setPropertyTerms($terms, $taxonomy, $reload = false)
   {
@@ -85,12 +65,12 @@ class Fuvals_houzezImport_Tokko
         }
       }
       foreach ($terms as $term) {
-        $term = html_entity_decode($term);
-        $termSlug = sanitize_title($term);
+        //$term = html_entity_decode($term);
+        $termSlug = sanitize_title($term['group_name']);
         if (!($fid = array_search($termSlug, $this->$taxonomy))) {
-          error_log('Adding term: ' . $term);
+          error_log('Adding term: ' . $term['group_name']);
           //error_log(print_r($propFeat, true));
-          $id = wp_insert_term($term, $taxonomy);
+          $id = wp_insert_term($term['group_name'], $taxonomy);
           if (is_wp_error($id)) {
             error_log($id->get_error_message());
           } else {
@@ -117,8 +97,8 @@ class Fuvals_houzezImport_Tokko
     $postData = array(
       'post_date' => date('Y-m-d h:i:s'),
       'post_date_gmt' => date('Y-m-d h:i:s'),
-      'post_title' => $this->property['titulo'],
-      'post_content' => html_entity_decode($this->property['in_obs']),
+      'post_title' => $this->property['publication_title'],
+      'post_content' => html_entity_decode($this->property['description']),
       'post_status' => $status,
       'post_type' => $type,
       'post_author' => $authorId,
@@ -141,14 +121,14 @@ class Fuvals_houzezImport_Tokko
     return $this->callApi($data);
   }
   //
-  public function get_properties()
-  {
-    $data = array_merge(
-      $this->apiData,
-      ['json' => 'fichas.destacadas']
-    );
-    return $this->callApi($data);
-  }
+  // public function get_properties()
+  // {
+  //   $data = array_merge(
+  //     $this->apiData,
+  //     ['json' => 'fichas.destacadas']
+  //   );
+  //   return $this->callApi($data);
+  // }
   public function get_valued_properties($i, $filters = [])
   {
     $data = array_merge(
@@ -197,6 +177,7 @@ class Fuvals_houzezImport_Tokko
   }
   public function process_property($ficha, $minval = false)
   {
+    //$ficha is only one property - schema: Array[0][data]->data of the property
     global $wpdb;
     $table_houzez_data = $wpdb->prefix . "postmeta";
     error_log("Procesando propiedad " . $ficha['id']);
@@ -210,11 +191,11 @@ class Fuvals_houzezImport_Tokko
       //Property features array
       $propertyFeatures = $ficha['tags'];
       //Additional features
-      if(isset($ficha['custom_tags'])){
+      if (isset($ficha['custom_tags'])) {
         $propertyFeatures[] = $ficha['custom_tags'];
       }
       //Get property
-      error_log("Getting property in DB: " . $this->property['in_fic']);
+      //error_log("Getting property in DB: " . $this->property['in_fic']);
       $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $this->property['id'] . "'");
       //Check if property is active
       // if ($this->property['in_int'] == 'True' && (empty($this->property['in_esi']) || $this->property['in_esi'] == 'N')) {
@@ -222,136 +203,135 @@ class Fuvals_houzezImport_Tokko
       //     error_log("Skipping Property MIN VAL: " . $this->property['in_val']);
       //     return;
       //   }
-        error_log("Processing Property");
-        //error_log(print_r($posts,true));
-        if (empty($postIdQ)) {
-          $new = true;
-          //Create property
-          error_log("Create property");
-          $this->postId = $this->create_property();
-        } else {
-          //Search property last modified date
-          $new = false;
-          //Clean properties
-          $this->postId = array_shift($postIdQ)->post_id;
-          if (count($postIdQ) > 1) {
-            error_log("Se han detectado más de 1 post asociados a la propiedad, se eliminarán los posteriores:" . print_r($postIdQ, true));
-            foreach ($postIdQ as $post) {
-              wp_delete_post($post->post_id);
-              error_log("Se ha eliminado el post:" . $post->post_id);
-            }
-          }
-          error_log("La propiedad ya existe:" . $this->postId . ", hay que implementar update");
-          //Change title or description
-          $data = array(
-            'ID' => $this->postId,
-            'post_title' => $this->property['titulo'],
-            'post_content' => html_entity_decode($this->property['in_obs']),
-          );
-          wp_update_post($data);
-          error_log("Actulizados título y desc:" . $this->postId);
-        }
-        // //Assign agent
-        // error_log("Asignando agente: $this->agent");
-        // $this->assign_agent();
-        //PROPERTY ID
-        update_post_meta($this->postId, 'fave_property_id', $this->property['id']);
-        //PROPERTY TYPE
-        $this->setPropertyTerms($this->property['type']['name'], 'property_type');
-        //PROPERTY CUSTOM FIELDS
-        $this->loadCustomFields();
-        //Set PROPERTY OPERATION TYPE
-        //$this->setOperationType($this->property['in_ope']);
-        //PRICE with currencie already set.
-        //$this->update_price();
-        //PRICE AND CURRENCIE FOR RENT
-        error_log("Create property: main data updated");
-        //ROOMS AND SIZES
-        update_post_meta($this->postId, 'fave_property_bedrooms', $this->property['ti_dor']);
-        update_post_meta($this->postId, 'fave_property_bathrooms', $this->property['in_bao']);
-        update_post_meta($this->postId, 'fave_property_year', $this->property['in_anio']);
-        update_post_meta($this->postId, 'fave_property_rooms', $this->property['ambientes']);
-        update_post_meta($this->postId, 'fave_property_garage', $this->property['garage']);
-        //Add video
-        if (!empty($this->property['in_vid']))
-          update_post_meta($this->postId, 'fave_video_url', $this->property['in_vid']);
-        //Type of unity conditional
-        if (!empty($this->property['tipo_medida']) || $this->property['in_tip'] == 'Campo' || $this->property['in_tip'] == 'Chacra') {
-          if ($this->property['in_tip'] == 'Campo' || $this->property['in_tip'] == 'Chacra') {
-            update_post_meta($this->postId, 'fave_property_land_postfix', 'HAS');
-            update_post_meta($this->postId, 'fave_property_size_prefix', 'HAS');
-          } else {
-            update_post_meta($this->postId, 'fave_property_land_postfix', $this->property['tipo_medida']);
-            update_post_meta($this->postId, 'fave_property_size_prefix', 'm²');
-          }
-        } else {
-          update_post_meta($this->postId, 'fave_property_land_postfix', 'm²');
-          update_post_meta($this->postId, 'fave_property_size_prefix', 'm²');
-        }
-        update_post_meta($this->postId, 'fave_property_size', $this->property['in_sto']);
-        update_post_meta($this->postId, 'fave_property_land', $this->property['in_sut']);
-        error_log("Create property: sizes updated");
-        //ADDRESS AND LOCATION DATA
-        $this->setPropertyTerms($this->property['in_pai'], 'property_country');
-        //$this->setPropertyTerms($this->property['?'], 'property_state');
-        $this->setPropertyTerms($this->property['in_loc'], 'property_city', true);
-        $this->setPropertyTerms($this->property['in_bar'], 'property_area', true);
-        update_post_meta($this->postId, 'fave_property_location', $this->property['in_coo']);
-        error_log("Create property location updated");
-        // MOSTRAR MAPA
-        update_post_meta($this->postId, 'fave_property_map', '1');
-        //update_post_meta($this->postId, 'houzez_geolocation_lat', $this->property['dormitorios']);
-        //update_post_meta($this->postId, 'houzez_geolocation_long', $this->property['dormitorios']);
-        //update_post_meta($this->postId, 'fave_property_zip', $this->property['dormitorios']);
-        //Necesito el pais, codigo postal y departamento.
-        //update_post_meta($this->postId, 'fave_property_map_address', $this->property['dormitorios']);
-        //MOSTRAR STREET VIEW
-        //update_post_meta($this->postId, 'fave_property_map_street_view', $this->property['dormitorios']);
-        //VIRTUAL TOUR 360
-        if (!empty($this->property['in_tou'])) {
-          update_post_meta($this->postId, 'fave_virtual_tour', "<iframe src='" . $this->property['in_tou'] . "'></iframe>");
-        }
-
-        //FEATURES
-        $this->setPropertyTerms($propertyFeatures, 'property_feature');
-        error_log("Create property features updated");
-        //LOAD IMAGES PACK FOR POST
-        //Do not update for now
-        if ($new) {
-          loadThumbProperty($this->postId, $this->property['img_princ']);
-          loadImgProperty($this->postId, $propertyImg);
-          //oldLoadImgProperty($this->postId, $this->property['img_princ'], $propertyImg, $this->property['in_fic']);
-        } elseif ($this->conciliateImages) {
-          //if ( !fuvalsHI_conciliateThumb($this->postId, $this->property['img_princ']) ) {
-          error_log('ERRORES en thumb... reloading');
-          if (!loadThumbProperty($this->postId, $this->property['img_princ'], true)) {
-            error_log('ERRORES IN RELOADING THUMB');
-          }
-          //}
-          //if ( !fuvalsHI_conciliateImages($this->postId, $propertyImg, $this->property['img_princ']) ) {
-          error_log('ERRORES in images... reloading');
-          if (!loadImgProperty($this->postId, $propertyImg, true)) {
-            error_log('ERRORES IN RELOADING IMGS');
-          }
-          //}
-        }
-        wp_update_post(['ID' => $this->postId]);
-        error_log('TERMINAMOS DE LEVANTAR LOS DATOS E IMAGENES');
+      error_log("Processing Property");
+      //error_log(print_r($posts,true));
+      //Check if property exist in database
+      if (empty($postIdQ)) {
+        $new = true;
+        //Create property
+        error_log("Create property");
+        $this->postId = $this->create_property();
       } else {
-        error_log("La propiedad no está para publicar: $ficha");
-        // La borramos si no está
-        if (!empty($postIdQ)) {
+        //Search property last modified date
+        $new = false;
+        //Clean properties
+        $this->postId = array_shift($postIdQ)->post_id;
+        if (count($postIdQ) > 1) {
+          error_log("Se han detectado más de 1 post asociados a la propiedad, se eliminarán los posteriores:" . print_r($postIdQ, true));
           foreach ($postIdQ as $post) {
             wp_delete_post($post->post_id);
             error_log("Se ha eliminado el post:" . $post->post_id);
           }
         }
+        error_log("La propiedad ya existe:" . $this->postId . ", hay que implementar update");
+        //Change title or description
+        $data = array(
+          'ID' => $this->postId,
+          'post_title' => $ficha['publication_title'],
+          'post_content' => html_entity_decode($ficha['description']),
+        );
+        wp_update_post($data);
+        error_log("Actulizados título y desc:" . $this->postId);
       }
+      // //Assign agent
+      // error_log("Asignando agente: $this->agent");
+      // $this->assign_agent();
+      //PROPERTY ID
+      update_post_meta($this->postId, 'fave_property_id', $this->property['id']);
+      //PROPERTY TYPE
+      //$this->setPropertyTerms($this->property['type']['name'], 'property_type');
+      //PROPERTY CUSTOM FIELDS
+      $this->loadCustomFields();
+      //Set PROPERTY OPERATION TYPE
+      $this->setOperationType($this->property['operations']);
+      //PRICE with currencie already set.
+      $this->set_price($this->property['operations']);
+      //PRICE AND CURRENCIE FOR RENT
+      error_log("Create property: main data updated");
+      //ROOMS AND SIZES
+      update_post_meta($this->postId, 'fave_property_bedrooms', $this->property['suite_amount']);
+      update_post_meta($this->postId, 'fave_property_bathrooms', $this->property['bathroom_amount']);
+      //update_post_meta($this->postId, 'fave_property_year', $this->property['in_anio']);
+      update_post_meta($this->postId, 'fave_property_rooms', $this->property['room_amount']);
+      update_post_meta($this->postId, 'fave_property_garage', $this->property['parking_lot_amount']);
+      //Add video
+      // if (!empty($this->property['videos']))
+      //   update_post_meta($this->postId, 'fave_video_url', $this->property['in_vid']);
+      //Type of unity conditional
+      // if (!empty($this->property['tipo_medida']) || $this->property['in_tip'] == 'Campo' || $this->property['in_tip'] == 'Chacra') {
+      //   if ($this->property['in_tip'] == 'Campo' || $this->property['in_tip'] == 'Chacra') {
+      //     update_post_meta($this->postId, 'fave_property_land_postfix', 'HAS');
+      //     update_post_meta($this->postId, 'fave_property_size_prefix', 'HAS');
+      //   } else {
+      //     update_post_meta($this->postId, 'fave_property_land_postfix', $this->property['tipo_medida']);
+      //     update_post_meta($this->postId, 'fave_property_size_prefix', 'm²');
+      //   }
+      // } else {
+      //   update_post_meta($this->postId, 'fave_property_land_postfix', 'm²');
+      //   update_post_meta($this->postId, 'fave_property_size_prefix', 'm²');
+      // }
+      // update_post_meta($this->postId, 'fave_property_size', $this->property['in_sto']);
+      // update_post_meta($this->postId, 'fave_property_land', $this->property['in_sut']);
+      update_post_meta($this->postId, 'fave_property_land_postfix', 'm²');
+      update_post_meta($this->postId, 'fave_property_size_prefix', 'm²');
+      error_log("Create property: sizes updated");
+      //ADDRESS AND LOCATION DATA
+      // $this->setPropertyTerms($this->property['real_address'], 'property_country');
+      // $this->setPropertyTerms($this->property['real_address'], 'property_city', true);
+      // $this->setPropertyTerms($this->property['real_address'], 'property_area', true);
+      // update_post_meta($this->postId, 'fave_property_location', $this->property['real_address']);
+      error_log("Create property location updated");
+      // MOSTRAR MAPA
+      update_post_meta($this->postId, 'fave_property_map', '1');
+      update_post_meta($this->postId, 'houzez_geolocation_lat', $this->property['geo_lat']);
+      update_post_meta($this->postId, 'houzez_geolocation_long', $this->property['geo_long']);
+      //update_post_meta($this->postId, 'fave_property_zip', $this->property['dormitorios']);
+      //Necesito el pais, codigo postal y departamento.
+      //update_post_meta($this->postId, 'fave_property_map_address', $this->property['dormitorios']);
+      //MOSTRAR STREET VIEW
+      //update_post_meta($this->postId, 'fave_property_map_street_view', $this->property['dormitorios']);
+
+      //FEATURES
+      $this->setPropertyTerms($propertyFeatures, 'property_feature');
+      error_log("Create property features updated");
+      //LOAD IMAGES PACK FOR POST
+      $imageList = $this->getImageUrl($propertyImg);
+      //Do not update for now
+      if ($new) {
+        loadThumbProperty($this->postId, $propertyImg['0']['image']);
+        loadImgProperty($this->postId, $imageList);
+        //oldLoadImgProperty($this->postId, $this->property['img_princ'], $propertyImg, $this->property['in_fic']);
+      } elseif ($this->conciliateImages) {
+        //if ( !fuvalsHI_conciliateThumb($this->postId, $this->property['img_princ']) ) {
+        error_log('ERRORES en thumb... reloading');
+        if (!loadThumbProperty($this->postId, $propertyImg['0']['image'], true)) {
+          error_log('ERRORES IN RELOADING THUMB');
+        }
+        //}
+        //if ( !fuvalsHI_conciliateImages($this->postId, $propertyImg, $this->property['img_princ']) ) {
+        error_log('ERRORES in images... reloading');
+        if (!loadImgProperty($this->postId, $imageList, true)) {
+          error_log('ERRORES IN RELOADING IMGS');
+        }
+        //}
+      }
+      wp_update_post(['ID' => $this->postId]);
+      error_log('TERMINAMOS DE LEVANTAR LOS DATOS E IMAGENES');
     } else {
       error_log("NO SE PUDO OBTENER DETALLE DE LA FICHA: $ficha");
     }
   }
-  //
+
+
+  public function getImageUrl($listImg)
+  {
+    $result = [];
+    foreach ($listImg as $img){
+      $result[] = $img['image'];
+    }
+
+    return $result;
+  }
   public function assign_agent()
   {
     if ($this->agent) {
@@ -384,79 +364,90 @@ class Fuvals_houzezImport_Tokko
   public function loadCustomFields()
   {
     error_log("Load Custom fields");
-    update_post_meta($this->postId, 'fave_anio_construccion', $this->property['in_anio']);
-    update_post_meta($this->postId, 'fave_antiguedad', $this->property['in_ant']);
-    update_post_meta($this->postId, 'fave_orientacion', $this->property['orientacion']);
-    update_post_meta($this->postId, 'fave_amueblado', $this->property['in_amu']);
-    update_post_meta($this->postId, 'fave_cant_pisos', $this->property['in_npi']);
-    update_post_meta($this->postId, 'fave_estado', $this->property['in_esa']);
-    update_post_meta($this->postId, 'fave_precio_alq', $this->property['in_vaa']);
-    update_post_meta($this->postId, 'fave_tipo_prop', $this->property['in_tpr']);
-    update_post_meta($this->postId, 'fave_ubicacion', $this->property['ubicacion']);
-    update_post_meta($this->postId, 'fave_categoria', $this->property['in_eco']);
-    if (!empty($this->property['in_exp'])) {
-      $moe = $this->property['in_moe'] == 'D' ? 'USD' : '$';
-      update_post_meta($this->postId, 'fave_expensas', $this->property['in_exp'] . ' ' . $moe);
+    //update_post_meta($this->postId, 'fave_anio_construccion', $this->property['in_anio']);
+    update_post_meta($this->postId, 'fave_antiguedad', $this->property['age']);
+    update_post_meta($this->postId, 'fave_orientacion', $this->property['orientation']);
+    //update_post_meta($this->postId, 'fave_amueblado', $this->property['in_amu']);
+    update_post_meta($this->postId, 'fave_cant_pisos', $this->property['floors_amount']);
+    update_post_meta($this->postId, 'fave_estado', $this->property['property_condition']);
+    //update_post_meta($this->postId, 'fave_precio_alq', $this->property['in_vaa']);
+    update_post_meta($this->postId, 'fave_tipo_prop', $this->property['type']['name']);
+    if (!empty($this->property['location'])) {
+      update_post_meta($this->postId, 'fave_ubicacion', $this->property['location']['full_location']);
     }
-    if (!empty($this->property['in_imp'])) {
-      $impuesto = $this->property['moneda_impuesto'] == 'D' ? 'USD' : '$';
-      update_post_meta($this->postId, 'fave_impuesto', $this->property['in_imp'] . ' ' . $impuesto);
-    }
-    update_post_meta($this->postId, 'fave_emprendimiento', $this->property['in_edi']);
-    update_post_meta($this->postId, 'fave_cant_asc', $this->property['in_asc']);
-    update_post_meta($this->postId, 'fave_sup_cub', $this->property['in_cub'] . 'm²');
-    update_post_meta($this->postId, 'fave_sup_semi_cub', $this->property['sup_semicubierta'] . 'm²');
-    update_post_meta($this->postId, 'fave_nro_plant', $this->property['in_npi']);
+    //update_post_meta($this->postId, 'fave_categoria', $this->property['in_eco']);
+    // if (!empty($this->property['in_exp'])) {
+    //   $moe = $this->property['in_moe'] == 'D' ? 'USD' : '$';
+    //   update_post_meta($this->postId, 'fave_expensas', $this->property['in_exp'] . ' ' . $moe);
+    // }
+    // if (!empty($this->property['in_imp'])) {
+    //   $impuesto = $this->property['moneda_impuesto'] == 'D' ? 'USD' : '$';
+    //   update_post_meta($this->postId, 'fave_impuesto', $this->property['in_imp'] . ' ' . $impuesto);
+    // }
+    //update_post_meta($this->postId, 'fave_emprendimiento', $this->property['in_edi']);
+    //update_post_meta($this->postId, 'fave_cant_asc', $this->property['in_asc']);
+    update_post_meta($this->postId, 'fave_sup_cub', $this->property['roofed_surface'] . 'm²');
+    update_post_meta($this->postId, 'fave_sup_semi_cub', $this->property['semiroofed_surface'] . 'm²');
+    update_post_meta($this->postId, 'fave_nro_plant', $this->property['floors_amount']);
     //update_post_meta($this->postId, 'fave_estado_of', $this->property['in_ale']);
-    update_post_meta($this->postId, 'fave_zonific', $this->property['in_zon']);
-    update_post_meta($this->postId, 'fave_fot', $this->property['in_fot']);
-    update_post_meta($this->postId, 'fave_cant_nav', $this->property['in_lin']);
-    update_post_meta($this->postId, 'fave_usos_limt', $this->property['in_uso']);
-    update_post_meta($this->postId, 'fave_tipo_piso', $this->property['in_arq']);
-    update_post_meta($this->postId, 'fave_ideal', $this->property['in_ide']);
-    update_post_meta($this->postId, 'fave_rubro', $this->property['in_rub']);
-    update_post_meta($this->postId, 'fave_frente', $this->property['in_pil']);
-    $activities = ['G' => 'Ganadería', 'A' => 'Agricultura', 'P' => 'Porcinos', 'C' => 'Apicultura', 'T' => 'Turístico', 'H' => 'Haras', 'F' => 'Forestación'];
-    delete_post_meta($post->ID, 'fave_actividades');
-    for ($i = 1; $i <= 3; $i++) {
-      $act_sum = $this->property['in_ac' . $i];
-      if (!empty($act_sum)) {
-        $activity = isset($activities[$act_sum]) ? $activities[$act_sum] : $act_sum;
-        add_post_meta($this->postId, 'fave_actividades', $activity);
+    update_post_meta($this->postId, 'fave_zonific', $this->property['zonification']);
+    // update_post_meta($this->postId, 'fave_fot', $this->property['in_fot']);
+    // update_post_meta($this->postId, 'fave_cant_nav', $this->property['in_lin']);
+    // update_post_meta($this->postId, 'fave_usos_limt', $this->property['in_uso']);
+    // update_post_meta($this->postId, 'fave_tipo_piso', $this->property['in_arq']);
+    // update_post_meta($this->postId, 'fave_ideal', $this->property['in_ide']);
+    // update_post_meta($this->postId, 'fave_rubro', $this->property['in_rub']);
+    // update_post_meta($this->postId, 'fave_frente', $this->property['in_pil']);
+    // $activities = ['G' => 'Ganadería', 'A' => 'Agricultura', 'P' => 'Porcinos', 'C' => 'Apicultura', 'T' => 'Turístico', 'H' => 'Haras', 'F' => 'Forestación'];
+    // delete_post_meta($post->ID, 'fave_actividades');
+    // for ($i = 1; $i <= 3; $i++) {
+    //   $act_sum = $this->property['in_ac' . $i];
+    //   if (!empty($act_sum)) {
+    //     $activity = isset($activities[$act_sum]) ? $activities[$act_sum] : $act_sum;
+    //     add_post_meta($this->postId, 'fave_actividades', $activity);
+    //   }
+    // }
+    // update_post_meta($this->postId, 'fave_valor_ha', $this->property['in_mt2']);
+    // update_post_meta($this->postId, 'fave_codigo_camp', $this->property['in_con']);
+    // update_post_meta($this->postId, 'fave_gas', $this->property['in_gas']);
+    // if ($this->property['in_tip'] == 'Departamento' || $this->property['in_tip'] == 'Apartamento' || $this->property['in_tip'] == 'Casa') {
+    //   update_post_meta($this->postId, 'fave_aire_acondicionado', $this->property['in_paq']);
+    // }
+    //update_post_meta($this->postId, 'fave_riego', $this->property['in_rie']);
+  }
+
+  public function setOperationType($propOp)
+  {
+    if (!empty($propOp)) {
+      if (count($propOp) > 1) {
+        foreach ($propOp as $op) {
+          //this only rewrite until the last op, we need to write all options
+          wp_set_object_terms($this->postId, $op['operation_type'], 'property_status');
+        }
+      } else {
+        $val = $propOp['0']['operation_type'];
+        wp_set_object_terms($this->postId, $val, 'property_status');
       }
     }
-    update_post_meta($this->postId, 'fave_valor_ha', $this->property['in_mt2']);
-    update_post_meta($this->postId, 'fave_codigo_camp', $this->property['in_con']);
-    update_post_meta($this->postId, 'fave_gas', $this->property['in_gas']);
-    if ($this->property['in_tip'] == 'Departamento' || $this->property['in_tip'] == 'Apartamento' || $this->property['in_tip'] == 'Casa') {
-      update_post_meta($this->postId, 'fave_aire_acondicionado', $this->property['in_paq']);
-    }
-    //update_post_meta($this->postId, 'fave_riego', $this->property['in_rie']);
-
-    //Fields that might be better to place as features
-    $othersFeatures = [];
-    if (!empty($this->property['in_dep'])) {
-      $othersFeatures[] = 'Dormitorio de servicio';
-    }
-    if (!empty($this->property['in_agu'])) {
-      $othersFeatures[] = 'Agua Caliente';
-    }
-    if (!empty($this->property['in_pav'])) {
-      $othersFeatures[] = 'Pavimentado';
-    }
-    if (!empty($this->property['in_clo'])) {
-      $othersFeatures[] = 'Cloaca';
-    }
-    if (!empty($this->property['in_lin'])) {
-      $othersFeatures[] = 'Linea Telefonica';
-    }
-    if (!empty($this->property['in_parking'])) {
-      $othersFeatures[] = 'Parking';
-    }
-    $this->setPropertyTerms($othersFeatures, 'property_feature');
   }
-  /*
-   */
+  public function set_price($ops)
+  {
+    if (!empty($ops)) {
+      if (count($ops) > 1) {
+        //functional but bad, we need to consult this
+        update_post_meta($this->postId, 'fave_property_price', $ops['0']['prices']['0']['price']);
+        update_post_meta($this->postId, 'fave_property_price_postfix', $ops['0']['prices']['0']['currency']);
+      } else {
+        update_post_meta($this->postId, 'fave_property_price', $ops['0']['prices']['0']['price']);
+        update_post_meta($this->postId, 'fave_property_price_postfix', $ops['0']['prices']['0']['currency']);
+      }
+    } else {
+      error_log("ERROR - Property doesn't have price");
+      update_post_meta($this->postId, 'fave_property_price', 'A confirmar');
+    }
+
+  }
+
   public function update_price()
   {
     if (!empty($this->property['in_val'])) {
@@ -536,20 +527,6 @@ class Fuvals_houzezImport_Tokko
     // fclose($file);
     return $result;
   }
-
-  // private function callApi($data)
-  // {
-  //   $ch = curl_init();
-  //   curl_setopt($ch, CURLOPT_URL, $this->apiUrl);
-  //   curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-  //   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  //   curl_setopt($ch, CURLOPT_HEADER, 0);
-  //   curl_setopt($ch, CURLOPT_TIMEOUT, 120);
-  //   $result = json_decode(curl_exec($ch), true);
-  //   curl_close($ch);
-  //   //error_log('API RESULT: ' . $result);
-  //   return $result;
-  // }
 }
 
 ?>

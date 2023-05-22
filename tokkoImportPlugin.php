@@ -175,7 +175,7 @@ function import_houzez_properties()
   //Get properties
   //$result = $houzezImport->get_valued_properties(0,[]);
   $result = $houzezImport->callApi();
-  error_log("RESULT:" . print_r($result,true));
+  //error_log("RESULT:" . print_r($result,true));
   // $limit = $result['resultado']['datos']['paginas'];
   // if ($pages) {
   //   $limit = $pages + $first;
@@ -183,8 +183,10 @@ function import_houzez_properties()
   //error_log("\n OBJECT OK \n Páginas:". print_r($result['resultado']['datos']['paginas'], true)."\n Hasta $limit\n");
   ////$i = 0;
   foreach ($result as $property){
-    $houzezImport->process_property($property['data'],$minval);
-    error_log("CHECK");
+    //convert object to array
+    $prop = json_decode(json_encode($property), true);
+    $houzezImport->process_property($prop['data'],$minval);
+    error_log("DONE: property-".$prop['id']);
   }
   // for ($i = $first; $i < $limit; $i++) {
   //   $result = $houzezImport->get_valued_properties($i, $filters);
