@@ -276,7 +276,6 @@ class Fuvals_houzezImport_Tokko
       //ROOMS AND SIZES
       update_post_meta($this->postId, 'fave_property_bedrooms', $this->property['suite_amount']);
       update_post_meta($this->postId, 'fave_property_bathrooms', $this->property['bathroom_amount']);
-      //update_post_meta($this->postId, 'fave_property_year', $this->property['in_anio']);
       update_post_meta($this->postId, 'fave_property_rooms', $this->property['room_amount']);
       update_post_meta($this->postId, 'fave_property_garage', $this->property['parking_lot_amount']);
 
@@ -312,12 +311,14 @@ class Fuvals_houzezImport_Tokko
       $this->setPropertyTerms($this->createAsso($location[3]), 'property_area', true);
       error_log("Create property location updated");
       // MOSTRAR MAPA
-      update_post_meta($this->postId, 'fave_property_map', '1');
-      update_post_meta($this->postId, 'houzez_geolocation_lat', $this->property['geo_lat']);
-      update_post_meta($this->postId, 'houzez_geolocation_long', $this->property['geo_long']);
+      $coordinates = $this->property['geo_lat'] ."," . $this->property['geo_long'] ;
+      update_post_meta($this->postId, 'fave_property_location', $coordinates);
+      // update_post_meta($this->postId, 'houzez_geolocation_lat', $this->property['geo_lat']);
+      // update_post_meta($this->postId, 'houzez_geolocation_long', $this->property['geo_long']);
+       update_post_meta($this->postId, 'fave_property_map', '1');
       //Necesito el pais, codigo postal y departamento.
-      $address = $this->property['geo_lat'] . " , " . $this->property['geo_long'];
-      update_post_meta($this->postId, 'fave_property_map_address', $address);
+      //$address = $this->property['geo_lat'] . " , " . $this->property['geo_long'];
+      update_post_meta($this->postId, 'fave_property_map_address',$this->property['real_address']);
       //FEATURES
       $this->setPropertyTerms($propertyFeatures, 'property_feature');
       error_log("Create property features updated");
