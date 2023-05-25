@@ -66,11 +66,11 @@ class Fuvals_houzezImport_Tokko
       }
       foreach ($terms as $term) {
         //$term = html_entity_decode($term);
-        $termSlug = sanitize_title($term['group_name']);
+        $termSlug = sanitize_title($term['name']);
         if (!($fid = array_search($termSlug, $this->$taxonomy))) {
-          error_log('Adding term: ' . $term['group_name']);
+          error_log('Adding term: ' . $term['name']);
           //error_log(print_r($propFeat, true));
-          $id = wp_insert_term($term['group_name'], $taxonomy);
+          $id = wp_insert_term($term['name'], $taxonomy);
           if (is_wp_error($id)) {
             error_log($id->get_error_message());
           } else {
@@ -86,12 +86,27 @@ class Fuvals_houzezImport_Tokko
     }
     return;
   }
-  //
+
+  public function set_status() {
+    $prop = $this->property;
+    $stat = 'draft';
+    if(isset($prop['custom_tags'])){
+      $tags = $prop['custom_tags'];
+      foreach($tags as $tag){
+        $aux = strpos($tag['group_name'],"Migración a");
+        if(!($aux == false)){
+          $stat = 'publish';
+          break;
+        }
+      }
+    }
+    return $stat;
+  }
   public function create_property()
   {
     //static values for test
     $type = 'property';
-    $status = 'publish';
+    $status = $this->set_status();
     $authorId = '1'; // admin wordpress
     //Edit post information
     $postData = array(
@@ -181,7 +196,6 @@ class Fuvals_houzezImport_Tokko
     global $wpdb;
     $table_houzez_data = $wpdb->prefix . "postmeta";
     error_log("Procesando propiedad " . $ficha['id']);
-    //Valido si ya existe
     //$apiData = $this->property_details($ficha);
     error_log("Detalis propiedad fetched ");
     if (isset($ficha)) {
@@ -189,13 +203,16 @@ class Fuvals_houzezImport_Tokko
       //Property images array
       $propertyImg = $ficha['photos'];
       //Property features array
-      $propertyFeatures = $ficha['tags'];
+      if (isset($ficha['tags'])){
+        $propertyFeatures = $ficha['tags'];
+      }else {
+        $propertyFeatures = [];
+      }
       //Additional features
       if (isset($ficha['custom_tags'])) {
         $propertyFeatures[] = $ficha['custom_tags'];
       }
       //Get property
-      //error_log("Getting property in DB: " . $this->property['in_fic']);
       $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $this->property['id'] . "'");
       //Check if property is active
       // if ($this->property['in_int'] == 'True' && (empty($this->property['in_esi']) || $this->property['in_esi'] == 'N')) {
@@ -239,7 +256,7 @@ class Fuvals_houzezImport_Tokko
       //PROPERTY ID
       update_post_meta($this->postId, 'fave_property_id', $this->property['id']);
       //PROPERTY TYPE
-      //$this->setPropertyTerms($this->property['type']['name'], 'property_type');
+      $this->setPropertyTerms($ficha['type'], 'property_type');
       //PROPERTY CUSTOM FIELDS
       $this->loadCustomFields();
       //Set PROPERTY OPERATION TYPE
@@ -254,6 +271,7 @@ class Fuvals_houzezImport_Tokko
       //update_post_meta($this->postId, 'fave_property_year', $this->property['in_anio']);
       update_post_meta($this->postId, 'fave_property_rooms', $this->property['room_amount']);
       update_post_meta($this->postId, 'fave_property_garage', $this->property['parking_lot_amount']);
+      
       //Add video
       // if (!empty($this->property['videos']))
       //   update_post_meta($this->postId, 'fave_video_url', $this->property['in_vid']);
@@ -269,28 +287,28 @@ class Fuvals_houzezImport_Tokko
       // } else {
       //   update_post_meta($this->postId, 'fave_property_land_postfix', 'm²');
       //   update_post_meta($this->postId, 'fave_property_size_prefix', 'm²');
+      
       // }
-      // update_post_meta($this->postId, 'fave_property_size', $this->property['in_sto']);
-      // update_post_meta($this->postId, 'fave_property_land', $this->property['in_sut']);
+      update_post_meta($this->postId, 'fave_property_size', $ficha['roofed_surface']);
+      update_post_meta($this->postId, 'fave_property_land', $ficha['total_surface']);
       update_post_meta($this->postId, 'fave_property_land_postfix', 'm²');
       update_post_meta($this->postId, 'fave_property_size_prefix', 'm²');
       error_log("Create property: sizes updated");
       //ADDRESS AND LOCATION DATA
-      // $this->setPropertyTerms($this->property['real_address'], 'property_country');
-      // $this->setPropertyTerms($this->property['real_address'], 'property_city', true);
-      // $this->setPropertyTerms($this->property['real_address'], 'property_area', true);
-      // update_post_meta($this->postId, 'fave_property_location', $this->property['real_address']);
+      $location = explode('|',$ficha['location']['full_location']);
+      //create associative array for setProperty
+      error_log("LOCALIDAD: ".print_r($location,true));
+      $this->setPropertyTerms($this->createAsso($location[0]), 'property_country',true);
+      $this->setPropertyTerms($this->createAsso($location[1]), 'property_city', true);
+      $this->setPropertyTerms($this->createAsso($location[2]), 'property_area', true);
       error_log("Create property location updated");
       // MOSTRAR MAPA
       update_post_meta($this->postId, 'fave_property_map', '1');
       update_post_meta($this->postId, 'houzez_geolocation_lat', $this->property['geo_lat']);
       update_post_meta($this->postId, 'houzez_geolocation_long', $this->property['geo_long']);
-      //update_post_meta($this->postId, 'fave_property_zip', $this->property['dormitorios']);
       //Necesito el pais, codigo postal y departamento.
-      //update_post_meta($this->postId, 'fave_property_map_address', $this->property['dormitorios']);
-      //MOSTRAR STREET VIEW
-      //update_post_meta($this->postId, 'fave_property_map_street_view', $this->property['dormitorios']);
-
+      $address = $location[0] . " , " . $location[1] . " , " . $location[2];
+      update_post_meta($this->postId, 'fave_property_map_address', $address);
       //FEATURES
       $this->setPropertyTerms($propertyFeatures, 'property_feature');
       error_log("Create property features updated");
@@ -323,6 +341,10 @@ class Fuvals_houzezImport_Tokko
   }
 
 
+  public function createAsso($loc){
+    $result = array(array('name' => $loc));
+    return $result;
+  }
   public function getImageUrl($listImg)
   {
     $result = [];

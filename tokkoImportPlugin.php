@@ -16,6 +16,7 @@
 
 defined('ABSPATH') or die('¡sin trampas!');
 
+ini_set("error_reporting", E_ALL & ~E_DEPRECATED);
 //Activate plugin
 register_activation_hook(__FILE__, 'houzezImp_activate');
 //Add action to the created cron job hook - Crear una funcion para esto.
@@ -172,21 +173,13 @@ function import_houzez_properties()
   }
   // Import object
   $houzezImport = new Fuvals_houzezImport_Tokko(0,false);
-  //Get properties
-  //$result = $houzezImport->get_valued_properties(0,[]);
   $result = $houzezImport->callApi();
   //error_log("RESULT:" . print_r($result,true));
-  // $limit = $result['resultado']['datos']['paginas'];
-  // if ($pages) {
-  //   $limit = $pages + $first;
-  // }
-  //error_log("\n OBJECT OK \n Páginas:". print_r($result['resultado']['datos']['paginas'], true)."\n Hasta $limit\n");
-  ////$i = 0;
   foreach ($result as $property){
     //convert object to array
     $prop = json_decode(json_encode($property), true);
-    $houzezImport->process_property($prop['data'],$minval);
-    error_log("DONE: property-".$prop['id']);
+    $houzezImport->process_property($prop['data'],0);
+    error_log("DONE: property-".$prop['data']['id']);
   }
   // for ($i = $first; $i < $limit; $i++) {
   //   $result = $houzezImport->get_valued_properties($i, $filters);
