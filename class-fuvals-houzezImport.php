@@ -87,14 +87,15 @@ class Fuvals_houzezImport_Tokko
     return;
   }
 
-  public function set_status() {
+  public function set_status()
+  {
     $prop = $this->property;
     $stat = 'draft';
-    if(isset($prop['custom_tags'])){
+    if (isset($prop['custom_tags'])) {
       $tags = $prop['custom_tags'];
-      foreach($tags as $tag){
-        $aux = strpos($tag['group_name'],"Migración a");
-        if(!($aux == false)){
+      foreach ($tags as $tag) {
+        $aux = strpos($tag['group_name'], "Migración a");
+        if (!($aux == false)) {
           $stat = 'publish';
           break;
         }
@@ -203,9 +204,9 @@ class Fuvals_houzezImport_Tokko
       //Property images array
       $propertyImg = $ficha['photos'];
       //Property features array
-      if (isset($ficha['tags'])){
+      if (isset($ficha['tags'])) {
         $propertyFeatures = $ficha['tags'];
-      }else {
+      } else {
         $propertyFeatures = [];
       }
       //Additional features
@@ -256,7 +257,9 @@ class Fuvals_houzezImport_Tokko
       //PROPERTY ID
       update_post_meta($this->postId, 'fave_property_id', $this->property['id']);
       //PROPERTY TYPE
-      $this->setPropertyTerms($ficha['type'], 'property_type');
+      $typeProp = $this->set_typeProp($ficha['type']);
+      error_log("TIPO: " . print_r($typeProp), true);
+      $this->setPropertyTerms($typeProp, 'property_type');
       //PROPERTY CUSTOM FIELDS
       $this->loadCustomFields();
       //Set PROPERTY OPERATION TYPE
@@ -271,7 +274,7 @@ class Fuvals_houzezImport_Tokko
       //update_post_meta($this->postId, 'fave_property_year', $this->property['in_anio']);
       update_post_meta($this->postId, 'fave_property_rooms', $this->property['room_amount']);
       update_post_meta($this->postId, 'fave_property_garage', $this->property['parking_lot_amount']);
-      
+
       //Add video
       // if (!empty($this->property['videos']))
       //   update_post_meta($this->postId, 'fave_video_url', $this->property['in_vid']);
@@ -287,7 +290,7 @@ class Fuvals_houzezImport_Tokko
       // } else {
       //   update_post_meta($this->postId, 'fave_property_land_postfix', 'm²');
       //   update_post_meta($this->postId, 'fave_property_size_prefix', 'm²');
-      
+
       // }
       update_post_meta($this->postId, 'fave_property_size', $ficha['roofed_surface']);
       update_post_meta($this->postId, 'fave_property_land', $ficha['total_surface']);
@@ -295,10 +298,10 @@ class Fuvals_houzezImport_Tokko
       update_post_meta($this->postId, 'fave_property_size_prefix', 'm²');
       error_log("Create property: sizes updated");
       //ADDRESS AND LOCATION DATA
-      $location = explode('|',$ficha['location']['full_location']);
+      $location = explode('|', $ficha['location']['full_location']);
       //create associative array for setProperty
-      error_log("LOCALIDAD: ".print_r($location,true));
-      $this->setPropertyTerms($this->createAsso($location[0]), 'property_country',true);
+      error_log("LOCALIDAD: " . print_r($location, true));
+      $this->setPropertyTerms($this->createAsso($location[0]), 'property_country', true);
       $this->setPropertyTerms($this->createAsso($location[1]), 'property_city', true);
       $this->setPropertyTerms($this->createAsso($location[2]), 'property_area', true);
       error_log("Create property location updated");
@@ -340,15 +343,20 @@ class Fuvals_houzezImport_Tokko
     }
   }
 
-
-  public function createAsso($loc){
+  public function set_typeProp($type)
+  {
+    $result = array(json_decode(json_encode($type), true));
+    return $result;
+  }
+  public function createAsso($loc)
+  {
     $result = array(array('name' => $loc));
     return $result;
   }
   public function getImageUrl($listImg)
   {
     $result = [];
-    foreach ($listImg as $img){
+    foreach ($listImg as $img) {
       $result[] = $img['image'];
     }
 
