@@ -89,11 +89,15 @@ class Fuvals_houzezImport_Tokko
 
   public function set_status()
   {
+    error_log("SET_STATUS: \n");
     $prop = $this->property;
     $stat = 'draft';
     if (isset($prop['custom_tags'])) {
       $tags = $prop['custom_tags'];
+      error_log("entraaaaaaa");
       foreach ($tags as $tag) {
+        $tag = json_decode(json_encode($tag),true);
+        error_log("entra a tag " . $tag['name']);
         $aux = strpos($tag['group_name'], "Migración a");
         if (!($aux == false)) {
           $stat = 'publish';
@@ -213,6 +217,7 @@ class Fuvals_houzezImport_Tokko
       if (isset($ficha['custom_tags'])) {
         $propertyFeatures[] = $ficha['custom_tags'];
       }
+      error_log("Features: " . print_r($propertyFeatures,true));
       //Get property
       $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $this->property['id'] . "'");
       //Check if property is active
@@ -302,15 +307,16 @@ class Fuvals_houzezImport_Tokko
       //create associative array for setProperty
       error_log("LOCALIDAD: " . print_r($location, true));
       $this->setPropertyTerms($this->createAsso($location[0]), 'property_country', true);
-      $this->setPropertyTerms($this->createAsso($location[1]), 'property_city', true);
-      $this->setPropertyTerms($this->createAsso($location[2]), 'property_area', true);
+      $this->setPropertyTerms($this->createAsso($location[1]), 'property_state', true);
+      $this->setPropertyTerms($this->createAsso($location[2]), 'property_city', true);
+      $this->setPropertyTerms($this->createAsso($location[3]), 'property_area', true);
       error_log("Create property location updated");
       // MOSTRAR MAPA
       update_post_meta($this->postId, 'fave_property_map', '1');
       update_post_meta($this->postId, 'houzez_geolocation_lat', $this->property['geo_lat']);
       update_post_meta($this->postId, 'houzez_geolocation_long', $this->property['geo_long']);
       //Necesito el pais, codigo postal y departamento.
-      $address = $location[0] . " , " . $location[1] . " , " . $location[2];
+      $address = $this->property['geo_lat'] . " , " . $this->property['geo_long'];
       update_post_meta($this->postId, 'fave_property_map_address', $address);
       //FEATURES
       $this->setPropertyTerms($propertyFeatures, 'property_feature');
