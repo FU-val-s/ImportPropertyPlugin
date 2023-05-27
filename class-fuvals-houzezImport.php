@@ -304,7 +304,7 @@ class Fuvals_houzezImport_Tokko
       //ADDRESS AND LOCATION DATA
       $location = explode('|', $ficha['location']['full_location']);
       //create associative array for setProperty
-      error_log("LOCALIDAD: " . print_r($location, true));
+      //error_log("LOCALIDAD: " . print_r($location, true));
       $this->setPropertyTerms($this->createAsso($location[0]), 'property_country', true);
       $this->setPropertyTerms($this->createAsso($location[1]), 'property_state', true);
       $this->setPropertyTerms($this->createAsso($location[2]), 'property_city', true);
@@ -318,7 +318,7 @@ class Fuvals_houzezImport_Tokko
       //$address = $this->property['geo_lat'] . " , " . $this->property['geo_long'];
       update_post_meta($this->postId, 'fave_property_map_address', $this->property['real_address']);
       //FEATURES
-      error_log("FEATURES: ".print_r(json_decode(json_encode($propertyFeatures),true),true));
+      //error_log("FEATURES: ".print_r(json_decode(json_encode($propertyFeatures),true),true));
       $this->setPropertyTerms($propertyFeatures, 'property_feature');
       $this->setPropertyTerms($extraFeatures, 'property_feature');
       error_log("Create property features updated");
@@ -353,7 +353,7 @@ class Fuvals_houzezImport_Tokko
   public function set_typeProp($type)
   {
     $result = array(json_decode(json_encode($type),true));
-    error_log("SET TYPE: ".print_r($result,true));
+    //error_log("SET TYPE: ".print_r($result,true));
     return $result;
   }
   public function createAsso($loc)
@@ -410,9 +410,9 @@ class Fuvals_houzezImport_Tokko
     update_post_meta($this->postId, 'fave_estado', $this->property['property_condition']);
     //update_post_meta($this->postId, 'fave_precio_alq', $this->property['in_vaa']);
     update_post_meta($this->postId, 'fave_tipo_prop', $this->property['type']['name']);
-    if (!empty($this->property['location'])) {
-      update_post_meta($this->postId, 'fave_ubicacion', $this->property['location']['full_location']);
-    }
+    // if (!empty($this->property['location'])) {
+    //   update_post_meta($this->postId, 'fave_ubicacion', $this->property['location']['full_location']);
+    // }
     //update_post_meta($this->postId, 'fave_categoria', $this->property['in_eco']);
     // if (!empty($this->property['in_exp'])) {
     //   $moe = $this->property['in_moe'] == 'D' ? 'USD' : '$';
@@ -454,6 +454,35 @@ class Fuvals_houzezImport_Tokko
     //update_post_meta($this->postId, 'fave_riego', $this->property['in_rie']);
   }
 
+  public function loadCustomPrices($ops){
+    error_log("LOAD RENT PRICES");
+    foreach($ops as $op){
+      if($op['operation_type'] == "Alquiler temporario"){
+        foreach($op['prices'] as $price){
+          if($price['period'] == "1ra quincena de enero"){
+            update_post_meta($this->postId, 'fave_first_half_jan', $price['price']);
+          }
+          if($price['period'] == "2da quincena de enero"){
+            update_post_meta($this->postId, 'fave_second_half_jan', $price['price']);
+          }
+          if($price['period'] == "1ra quincena de febrero"){
+            update_post_meta($this->postId, 'fave_first_half_feb', $price['price']);
+          }
+          if($price['period'] == "2da quincena de febrero"){
+            update_post_meta($this->postId, 'fave_second_half_feb', $price['price']);
+          }
+          if($price['period'] == "Enero"){
+            update_post_meta($this->postId, 'fave_alq_all_jan', $price['price']);
+          }
+          if($price['period'] == "Febrero"){
+            update_post_meta($this->postId, 'fave_alq_all_feb', $price['price']);
+          }
+        }
+      }
+    }
+
+  }
+
   public function setOperationType($propOp)
   {
     if (!empty($propOp)) {
@@ -475,6 +504,8 @@ class Fuvals_houzezImport_Tokko
         //functional but bad, we need to consult this
         update_post_meta($this->postId, 'fave_property_price', $ops['0']['prices']['0']['price']);
         update_post_meta($this->postId, 'fave_property_price_postfix', $ops['0']['prices']['0']['currency']);
+        update_post_meta($this->postId, 'fave_property_sec_price', $ops['1']['prices']['0']['price']);
+        $this->loadCustomPrices($ops);
       } else {
         update_post_meta($this->postId, 'fave_property_price', $ops['0']['prices']['0']['price']);
         update_post_meta($this->postId, 'fave_property_price_postfix', $ops['0']['prices']['0']['currency']);
