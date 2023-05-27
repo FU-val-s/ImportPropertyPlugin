@@ -29,6 +29,7 @@ class Fuvals_houzezImport_Tokko
       'property_status',
       'property_feature',
       'property_country',
+      'property_state',
       'property_city',
       'property_area'
     ];
@@ -89,18 +90,17 @@ class Fuvals_houzezImport_Tokko
 
   public function set_status()
   {
-    error_log("SET_STATUS: \n");
+    error_log("SET_STATUS FOR: ".$this->property['id']."\n");
     $prop = $this->property;
-    $stat = 'draft';
+    $stat = 'publish';
     if (isset($prop['custom_tags'])) {
-      $tags = $prop['custom_tags'];
-      error_log("entraaaaaaa");
+      $tags = json_decode(json_encode($prop['custom_tags']), true);
       foreach ($tags as $tag) {
         $tag = json_decode(json_encode($tag), true);
-        error_log("entra a tag " . $tag['name']);
-        $aux = strpos($tag['group_name'], "Migración a");
-        if (!($aux == false)) {
-          $stat = 'publish';
+        //error_log("entra a tag " . $tag['name']);
+        $aux = strpos($tag['name'], "Compartida");
+        if (!($aux === false)) {
+          $stat = 'draft';
           break;
         }
       }
@@ -117,7 +117,7 @@ class Fuvals_houzezImport_Tokko
     $postData = array(
       'post_date' => date('Y-m-d h:i:s'),
       'post_date_gmt' => date('Y-m-d h:i:s'),
-      'post_title' => $this->property['publication_title'],
+      'post_title' => $this->property['address'],
       'post_content' => html_entity_decode($this->property['description']),
       'post_status' => $status,
       'post_type' => $type,
@@ -215,9 +215,9 @@ class Fuvals_houzezImport_Tokko
       }
       //Additional features
       if (isset($ficha['custom_tags'])) {
-        $propertyFeatures[] = $ficha['custom_tags'];
+        $extraFeatures = $ficha['custom_tags'];
       }
-      error_log("Features: " . print_r($propertyFeatures, true));
+      //error_log("Features: " . print_r($propertyFeatures, true));
       //Get property
       $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $this->property['id'] . "'");
       //Check if property is active
@@ -263,7 +263,7 @@ class Fuvals_houzezImport_Tokko
       update_post_meta($this->postId, 'fave_property_id', $this->property['id']);
       //PROPERTY TYPE
       $typeProp = $this->set_typeProp($ficha['type']);
-      error_log("TIPO: " . print_r($typeProp), true);
+      //error_log("TIPO: " . print_r($typeProp), true);
       $this->setPropertyTerms($typeProp, 'property_type');
       //PROPERTY CUSTOM FIELDS
       $this->loadCustomFields();
@@ -318,7 +318,9 @@ class Fuvals_houzezImport_Tokko
       //$address = $this->property['geo_lat'] . " , " . $this->property['geo_long'];
       update_post_meta($this->postId, 'fave_property_map_address', $this->property['real_address']);
       //FEATURES
+      error_log("FEATURES: ".print_r(json_decode(json_encode($propertyFeatures),true),true));
       $this->setPropertyTerms($propertyFeatures, 'property_feature');
+      $this->setPropertyTerms($extraFeatures, 'property_feature');
       error_log("Create property features updated");
       //LOAD IMAGES PACK FOR POST
       $imageList = $this->getImageUrl($propertyImg);
@@ -350,7 +352,8 @@ class Fuvals_houzezImport_Tokko
 
   public function set_typeProp($type)
   {
-    $result = array(json_decode(json_encode($type), true));
+    $result = array(json_decode(json_encode($type),true));
+    error_log("SET TYPE: ".print_r($result,true));
     return $result;
   }
   public function createAsso($loc)
@@ -362,7 +365,7 @@ class Fuvals_houzezImport_Tokko
   {
     $result = [];
     foreach ($listImg as $img) {
-      $result[] = $img['image'];
+      $result[] = $img['original'];
     }
 
     return $result;

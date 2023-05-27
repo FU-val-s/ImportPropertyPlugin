@@ -154,7 +154,7 @@ function import_houzez_properties()
   // error_log("FILTERS: ".print_r($filters, true));
   // error_log("------START DEBUG------\n Desde: $first hasta $pages con agente: $agent --> OPERATION: $operation, Conciliate images: $conciliateImages");
   error_log("------START DEBUG------\n");
-  set_time_limit(0);
+  set_time_limit(300);
   ini_set('max_execution_time', '-1');
   require_once(ABSPATH . 'wp-admin/includes/file.php');
   require_once(ABSPATH . 'wp-admin/includes/media.php');
