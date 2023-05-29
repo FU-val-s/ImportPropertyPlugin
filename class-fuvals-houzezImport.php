@@ -53,7 +53,7 @@ class Fuvals_houzezImport_Tokko
   //
 
   //
-  public function setPropertyTerms($terms, $taxonomy, $reload = false)
+  public function setPropertyTerms($terms, $taxonomy, $reload = false, $field_name = "name")
   {
     $termIds = [];
     error_log('Propiedad Setting terms: ' . $taxonomy);
@@ -67,11 +67,11 @@ class Fuvals_houzezImport_Tokko
       }
       foreach ($terms as $term) {
         //$term = html_entity_decode($term);
-        $termSlug = sanitize_title($term['name']);
+        $termSlug = sanitize_title($term[$field_name]);
         if (!($fid = array_search($termSlug, $this->$taxonomy))) {
-          error_log('Adding term: ' . $term['name']);
+          error_log('Adding term: ' . $term[$field_name]);
           //error_log(print_r($propFeat, true));
-          $id = wp_insert_term($term['name'], $taxonomy);
+          $id = wp_insert_term($term[$field_name], $taxonomy);
           if (is_wp_error($id)) {
             error_log($id->get_error_message());
           } else {
@@ -90,7 +90,7 @@ class Fuvals_houzezImport_Tokko
 
   public function set_status()
   {
-    error_log("SET_STATUS FOR: ".$this->property['id']."\n");
+    error_log("SET_STATUS FOR: " . $this->property['id'] . "\n");
     $prop = $this->property;
     $stat = 'publish';
     if (isset($prop['custom_tags'])) {
@@ -117,7 +117,7 @@ class Fuvals_houzezImport_Tokko
     $postData = array(
       'post_date' => date('Y-m-d h:i:s'),
       'post_date_gmt' => date('Y-m-d h:i:s'),
-      'post_title' => $this->property['address'],
+      'post_title' => $this->property['fake_address'],
       'post_content' => html_entity_decode($this->property['description']),
       'post_status' => $status,
       'post_type' => $type,
@@ -320,7 +320,7 @@ class Fuvals_houzezImport_Tokko
       //FEATURES
       //error_log("FEATURES: ".print_r(json_decode(json_encode($propertyFeatures),true),true));
       $this->setPropertyTerms($propertyFeatures, 'property_feature');
-      $this->setPropertyTerms($extraFeatures, 'property_feature');
+      $this->setPropertyTerms($extraFeatures, 'property_feature', false, 'group_name');
       error_log("Create property features updated");
       //LOAD IMAGES PACK FOR POST
       $imageList = $this->getImageUrl($propertyImg);
@@ -352,7 +352,7 @@ class Fuvals_houzezImport_Tokko
 
   public function set_typeProp($type)
   {
-    $result = array(json_decode(json_encode($type),true));
+    $result = array(json_decode(json_encode($type), true));
     //error_log("SET TYPE: ".print_r($result,true));
     return $result;
   }
@@ -454,33 +454,37 @@ class Fuvals_houzezImport_Tokko
     //update_post_meta($this->postId, 'fave_riego', $this->property['in_rie']);
   }
 
-  public function loadCustomPrices($ops){
+  public function loadCustomPrices($op)
+  {
     error_log("LOAD RENT PRICES");
-    foreach($ops as $op){
-      if($op['operation_type'] == "Alquiler temporario"){
-        foreach($op['prices'] as $price){
-          if($price['period'] == "1ra quincena de enero"){
-            update_post_meta($this->postId, 'fave_first_half_jan', $price['price']);
-          }
-          if($price['period'] == "2da quincena de enero"){
-            update_post_meta($this->postId, 'fave_second_half_jan', $price['price']);
-          }
-          if($price['period'] == "1ra quincena de febrero"){
-            update_post_meta($this->postId, 'fave_first_half_feb', $price['price']);
-          }
-          if($price['period'] == "2da quincena de febrero"){
-            update_post_meta($this->postId, 'fave_second_half_feb', $price['price']);
-          }
-          if($price['period'] == "Enero"){
-            update_post_meta($this->postId, 'fave_alq_all_jan', $price['price']);
-          }
-          if($price['period'] == "Febrero"){
-            update_post_meta($this->postId, 'fave_alq_all_feb', $price['price']);
-          }
-        }
+    foreach ($op['prices'] as $price) {
+      if ($price['period'] == "1ra quincena de enero") {
+        update_post_meta($this->postId, 'fave_first_half_jan', $price['price']);
+        update_post_meta($this->postId, 'fave_first_half_jan_ref', $price['price']);
+        update_post_meta($this->postId, 'fave_property_sec_price', $price['price']);
+      }
+      if ($price['period'] == "2da quincena de enero") {
+        update_post_meta($this->postId, 'fave_second_half_jan', $price['price']);
+        update_post_meta($this->postId, 'fave_second_half_jan_ref', $price['price']);
+      }
+      if ($price['period'] == "1ra quincena de febrero") {
+        update_post_meta($this->postId, 'fave_first_half_feb', $price['price']);
+        update_post_meta($this->postId, 'fave_first_half_feb_ref', $price['price']);
+      }
+      if ($price['period'] == "2da quincena de febrero") {
+        update_post_meta($this->postId, 'fave_second_half_feb', $price['price']);
+        update_post_meta($this->postId, 'fave_second_half_feb_ref', $price['price']);
+      }
+      if ($price['period'] == "Enero") {
+        update_post_meta($this->postId, 'fave_alq_all_jan', $price['price']);
+        update_post_meta($this->postId, 'fave_alq_all_jan_ref', $price['price']);
+      }
+      if ($price['period'] == "Febrero") {
+        update_post_meta($this->postId, 'fave_alq_all_feb', $price['price']);
+        update_post_meta($this->postId, 'fave_alq_all_feb_ref', $price['price']);
+
       }
     }
-
   }
 
   public function setOperationType($propOp)
@@ -500,15 +504,20 @@ class Fuvals_houzezImport_Tokko
   public function set_price($ops)
   {
     if (!empty($ops)) {
-      if (count($ops) > 1) {
-        //functional but bad, we need to consult this
-        update_post_meta($this->postId, 'fave_property_price', $ops['0']['prices']['0']['price']);
-        update_post_meta($this->postId, 'fave_property_price_postfix', $ops['0']['prices']['0']['currency']);
-        update_post_meta($this->postId, 'fave_property_sec_price', $ops['1']['prices']['0']['price']);
-        $this->loadCustomPrices($ops);
-      } else {
-        update_post_meta($this->postId, 'fave_property_price', $ops['0']['prices']['0']['price']);
-        update_post_meta($this->postId, 'fave_property_price_postfix', $ops['0']['prices']['0']['currency']);
+      try {
+        foreach ($ops as $op) {
+          if ($op['operation_type'] == "Venta") {
+            error_log("ENTRA EN VENTA PRICES ======");
+            update_post_meta($this->postId, 'fave_property_price', $op['prices']['0']['price']);
+          }
+          if ($op['operation_type'] == "Alquiler temporario") {
+            //Rent Operation
+            error_log("ENTRA EN ALQUILER PRICES ======");
+            $this->loadCustomPrices($op);
+          }
+        }
+      } catch (\Exception $e) {
+        error_log("ERROR IN PRICE:\n" . $e->getMessage());
       }
     } else {
       error_log("ERROR - Property doesn't have price");

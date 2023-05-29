@@ -163,13 +163,14 @@ function import_houzez_properties()
   //LOAD FIELDS BUILDER ONLY ONCE
   $table_houzez_fields_builds = $wpdb->prefix . "houzez_fields_builder";
   $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'estado'");
-  if (!empty($fieldsQ)) {
+  if (empty($fieldsQ)) {
     createCustomFields();
   }
-  $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'aire_acondicionado'");
+  $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'alq_all_jan_ref'");
   if (empty($fieldsQ)) {
     createNewCustomFields();
   }
+  
   // Import object
   $houzezImport = new Fuvals_houzezImport_Tokko(0, false);
   $result = $houzezImport->callApi();
@@ -177,6 +178,7 @@ function import_houzez_properties()
   foreach ($result as $property) {
     //convert object to array
     $prop = json_decode(json_encode($property), true);
+    //error_log(print_r($prop,true));
     $houzezImport->process_property($prop['data'], 0);
     error_log("DONE: property-" . $prop['data']['id'] . "\n");
   }
@@ -451,7 +453,13 @@ function createNewCustomFields()
 {
   global $wpdb;
   $table = $wpdb->prefix . "houzez_fields_builder";
-  $wpdb->insert($table, array('label' => 'Aire Acondicionado', 'field_id' => 'aire_acondicionado', 'type' => 'text', 'is_search' => 'yes'));
+  //Ref-fields for prices
+  $wpdb->insert($table, array('label' => 'Alquiler todo Enero - Ref', 'field_id' => 'alq_all_jan_ref', 'type' => 'text', 'is_search' => 'yes'));
+  $wpdb->insert($table, array('label' => 'Alquiler todo Febrero - Ref', 'field_id' => 'alq_all_feb_ref', 'type' => 'text', 'is_search' => 'yes'));
+  $wpdb->insert($table, array('label' => 'Alquiler primera quincena de Enero - Ref', 'field_id' => 'first_half_jan_ref', 'type' => 'text', 'is_search' => 'yes'));
+  $wpdb->insert($table, array('label' => 'Alquiler segunda quincena de Enero - Ref', 'field_id' => 'second_half_jan_ref', 'type' => 'text', 'is_search' => 'yes'));
+  $wpdb->insert($table, array('label' => 'Alquiler primera quincena de Febrero - Ref', 'field_id' => 'first_half_feb_ref', 'type' => 'text', 'is_search' => 'yes'));
+  $wpdb->insert($table, array('label' => 'Alquiler segunda quincena de Febrero - Ref', 'field_id' => 'second_half_feb_ref', 'type' => 'text', 'is_search' => 'yes'));
 }
 
 function createCustomFields()
