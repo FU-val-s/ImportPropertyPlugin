@@ -2,6 +2,10 @@
 require './api.php';
 
 class Call {
+  private $auth;
+  public function __construct() {
+    $this->auth = new TokkoAuth('b87fe1d3b55263138083c53238333311c8046c81');
+  }
   public function api() {
     $data_arr = [
       "current_localization_id" => 0,
@@ -14,10 +18,9 @@ class Call {
       "filters" => []
     ];
     $data = json_decode(json_encode($data_arr));
-    $auth = new TokkoAuth('b87fe1d3b55263138083c53238333311c8046c81');
     // CREATE PROPERTY SEARCH OBJECT
-    $search = new TokkoSearch($auth);
-    $search->TokkoSearch($auth, $data);
+    $search = new TokkoSearch($this->auth);
+    $search->TokkoSearch($this->auth, $data);
     //order_by=price&limit=20&order=desc&page=1&data='+JSON.stringify(data);
     // ORDER BY, LIMIT, ORDER
     //$search->do_search(500, 'deleted_at');
@@ -37,7 +40,13 @@ class Call {
     print "TERMINA \n";
     exit();
   }
+  public function prop() {
+    print "GETTING PROP: ".$this->auth->key;
+    $property = new TokkoProperty('reference_code', '587', $this->auth);
+    print_r($property);
+  }
 }
+
 $result = new Call;
-$result->api();
+$result->prop();
 ?>

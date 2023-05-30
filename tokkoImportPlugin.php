@@ -153,7 +153,7 @@ function import_houzez_properties()
   // error_log("FILTERS: ".print_r($filters, true));
   // error_log("------START DEBUG------\n Desde: $first hasta $pages con agente: $agent --> OPERATION: $operation, Conciliate images: $conciliateImages");
   error_log("------START DEBUG------\n");
-  set_time_limit(300);
+  set_time_limit(0);
   ini_set('max_execution_time', '-1');
   require_once(ABSPATH . 'wp-admin/includes/file.php');
   require_once(ABSPATH . 'wp-admin/includes/media.php');
@@ -166,11 +166,11 @@ function import_houzez_properties()
   if (empty($fieldsQ)) {
     createCustomFields();
   }
-  $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'alq_all_jan_ref'");
+  $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'alq-all-jan-ref'");
   if (empty($fieldsQ)) {
     createNewCustomFields();
   }
-  
+
   // Import object
   $houzezImport = new Fuvals_houzezImport_Tokko(0, false);
   $result = $houzezImport->callApi();
@@ -179,7 +179,7 @@ function import_houzez_properties()
     //convert object to array
     $prop = json_decode(json_encode($property), true);
     //error_log(print_r($prop,true));
-    $houzezImport->process_property($prop['data'], 0);
+    $houzezImport->process_property($prop['data'], 0, false);
     error_log("DONE: property-" . $prop['data']['id'] . "\n");
   }
   // for ($i = $first; $i < $limit; $i++) {
@@ -454,12 +454,20 @@ function createNewCustomFields()
   global $wpdb;
   $table = $wpdb->prefix . "houzez_fields_builder";
   //Ref-fields for prices
-  $wpdb->insert($table, array('label' => 'Alquiler todo Enero - Ref', 'field_id' => 'alq_all_jan_ref', 'type' => 'text', 'is_search' => 'yes'));
-  $wpdb->insert($table, array('label' => 'Alquiler todo Febrero - Ref', 'field_id' => 'alq_all_feb_ref', 'type' => 'text', 'is_search' => 'yes'));
-  $wpdb->insert($table, array('label' => 'Alquiler primera quincena de Enero - Ref', 'field_id' => 'first_half_jan_ref', 'type' => 'text', 'is_search' => 'yes'));
-  $wpdb->insert($table, array('label' => 'Alquiler segunda quincena de Enero - Ref', 'field_id' => 'second_half_jan_ref', 'type' => 'text', 'is_search' => 'yes'));
-  $wpdb->insert($table, array('label' => 'Alquiler primera quincena de Febrero - Ref', 'field_id' => 'first_half_feb_ref', 'type' => 'text', 'is_search' => 'yes'));
-  $wpdb->insert($table, array('label' => 'Alquiler segunda quincena de Febrero - Ref', 'field_id' => 'second_half_feb_ref', 'type' => 'text', 'is_search' => 'yes'));
+  $wpdb->insert($table, array('label' => 'Alquiler todo Enero - Ref', 'field_id' => 'alq-all-jan-ref', 'type' => 'text', 'is_search' => 'no'));
+  $wpdb->insert($table, array('label' => 'Alquiler todo Febrero - Ref', 'field_id' => 'alq-all-feb-ref', 'type' => 'text', 'is_search' => 'no'));
+  $wpdb->insert($table, array('label' => 'Alquiler primera quincena de Enero - Ref', 'field_id' => 'first-half-jan-ref', 'type' => 'text', 'is_search' => 'no'));
+  $wpdb->insert($table, array('label' => 'Alquiler segunda quincena de Enero - Ref', 'field_id' => 'second-half-jan-ref', 'type' => 'text', 'is_search' => 'no'));
+  $wpdb->insert($table, array('label' => 'Alquiler primera quincena de Febrero - Ref', 'field_id' => 'first-half-feb-ref', 'type' => 'text', 'is_search' => 'no'));
+  $wpdb->insert($table, array('label' => 'Alquiler segunda quincena de Febrero - Ref', 'field_id' => 'second-half-feb-ref', 'type' => 'text', 'is_search' => 'no'));
+  //PERIOD OF RENT FIELDS
+  $wpdb->insert($table, array('label' => 'Alquiler todo Enero', 'field_id' => 'alq_all_jan', 'type' => 'text', 'is_search' => 'yes'));
+  $wpdb->insert($table, array('label' => 'Alquiler todo Febrero', 'field_id' => 'alq_all_feb', 'type' => 'text', 'is_search' => 'yes'));
+  $wpdb->insert($table, array('label' => 'Alquiler primera quincena de Enero', 'field_id' => 'first-half-jan', 'type' => 'text', 'is_search' => 'yes'));
+  $wpdb->insert($table, array('label' => 'Alquiler segunda quincena de Enero', 'field_id' => 'second-half-jan', 'type' => 'text', 'is_search' => 'yes'));
+  $wpdb->insert($table, array('label' => 'Alquiler primera quincena de Febrero', 'field_id' => 'first-half-feb', 'type' => 'text', 'is_search' => 'yes'));
+  $wpdb->insert($table, array('label' => 'Alquiler segunda quincena de Febrero', 'field_id' => 'second-half-feb', 'type' => 'text', 'is_search' => 'yes'));
+  $wpdb->insert($table, array('label' => 'Nro. Plantas', 'field_id' => 'nro-plant', 'type' => 'text', 'is_search' => 'yes'));
 }
 
 function createCustomFields()
@@ -468,29 +476,27 @@ function createCustomFields()
   try {
     global $wpdb;
     $table = $wpdb->prefix . "houzez_fields_builder";
-    $wpdb->insert($table, array('label' => 'Año de construccion', 'field_id' => 'anio_construccion', 'type' => 'text', 'is_search' => 'yes'));
+    //$wpdb->insert($table, array('label' => 'Año de construccion', 'field_id' => 'anio-construccion', 'type' => 'text', 'is_search' => 'yes'));
     $wpdb->insert($table, array('label' => 'Antiguedad', 'field_id' => 'antiguedad', 'type' => 'text', 'is_search' => 'yes'));
     $wpdb->insert($table, array('label' => 'Orientacion', 'field_id' => 'orientacion', 'type' => 'text', 'is_search' => 'yes'));
     $wpdb->insert($table, array('label' => 'Amueblado', 'field_id' => 'amueblado', 'type' => 'text', 'is_search' => 'yes'));
-    $wpdb->insert($table, array('label' => 'Cantidad de pisos', 'field_id' => 'cant_pisos', 'type' => 'text', 'is_search' => 'yes'));
     $wpdb->insert($table, array('label' => 'Estado', 'field_id' => 'estado', 'type' => 'text', 'is_search' => 'yes'));
     //$wpdb->insert($table, array('label' => 'Precio Alquiler', 'field_id' => 'precio_alq', 'type' => 'text', 'is_search' => 'yes'));
     //MUST DO - El titulo de este campo cambia segun el tipo de proiedad que sea por lo cual: tipo de $property[type]
-    $wpdb->insert($table, array('label' => 'Tipo de Propiedad', 'field_id' => 'tipo_prop', 'type' => 'text', 'is_search' => 'yes'));
+    //$wpdb->insert($table, array('label' => 'Tipo de Propiedad', 'field_id' => 'tipo_prop', 'type' => 'text', 'is_search' => 'yes'));
     //$wpdb->insert($table, array('label' => 'Ubicacion', 'field_id' => 'ubicacion', 'type' => 'text', 'is_search' => 'yes'));
     //$wpdb->insert($table, array('label' => 'Expensas', 'field_id' => 'expensas', 'type' => 'text', 'is_search' => 'yes'));
-    $wpdb->insert($table, array('label' => 'Categoria', 'field_id' => 'categoria', 'type' => 'text', 'is_search' => 'yes'));
+    //$wpdb->insert($table, array('label' => 'Categoria', 'field_id' => 'categoria', 'type' => 'text', 'is_search' => 'yes'));
     //$wpdb->insert($table, array('label' => 'Impuesto', 'field_id' => 'impuesto', 'type' => 'text', 'is_search' => 'yes'));
     //$wpdb->insert($table, array('label' => 'Emprendimiento', 'field_id' => 'emprendimiento', 'type' => 'text', 'is_search' => 'yes'));
-    $wpdb->insert($table, array('label' => 'Cantidad de Ascensores', 'field_id' => 'cant_asc', 'type' => 'text', 'is_search' => 'yes'));
+    //$wpdb->insert($table, array('label' => 'Cantidad de Ascensores', 'field_id' => 'cant_asc', 'type' => 'text', 'is_search' => 'yes'));
     //Superficie
-    $wpdb->insert($table, array('label' => 'Sup. total', 'field_id' => 'sup_total', 'type' => 'text', 'is_search' => 'yes'));
-    $wpdb->insert($table, array('label' => 'Sup. cubierta', 'field_id' => 'sup_cub', 'type' => 'text', 'is_search' => 'yes'));
+    //$wpdb->insert($table, array('label' => 'Sup. total', 'field_id' => 'sup_total', 'type' => 'text', 'is_search' => 'yes'));
+    //$wpdb->insert($table, array('label' => 'Sup. cubierta', 'field_id' => 'sup_cub', 'type' => 'text', 'is_search' => 'yes'));
     //$wpdb->insert($table, array('label' => 'Sup. semi-cubierta', 'field_id' => 'sup_semi_cub', 'type' => 'text', 'is_search' => 'yes'));
     //$wpdb->insert( $table, array( 'label' => 'Sup. Casco', 'field_id' => 'sup_casc' , 'type' => 'text' , 'is_search' => 'yes' ) );
     //$wpdb->insert( $table, array( 'label' => 'Sup. Casa', 'field_id' => 'sup_casa' , 'type' => 'text' , 'is_search' => 'yes' ) );
 
-    $wpdb->insert($table, array('label' => 'Nro. Plantas', 'field_id' => 'nro_plant', 'type' => 'text', 'is_search' => 'yes'));
     //$wpdb->insert($table, array('label' => 'Estado oficinas', 'field_id' => 'estado_of', 'type' => 'text', 'is_search' => 'yes'));
     //$wpdb->insert($table, array('label' => 'Zonificacion', 'field_id' => 'zonific', 'type' => 'text', 'is_search' => 'yes'));
     //Factor de ocupacion total
@@ -512,15 +518,6 @@ function createCustomFields()
     // $wpdb->insert($table, array('label' => 'Codigo', 'field_id' => 'codigo_camp', 'type' => 'text', 'is_search' => 'yes'));
     // $wpdb->insert($table, array('label' => 'Riego', 'field_id' => 'riego', 'type' => 'text', 'is_search' => 'yes'));
     // $wpdb->insert($table, array('label' => 'Gas', 'field_id' => 'gas', 'type' => 'text', 'is_search' => 'yes'));
-
-
-    //PERIOD OF RENT FIELDS
-    $wpdb->insert($table, array('label' => 'Alquiler todo Enero', 'field_id' => 'alq_all_jan', 'type' => 'text', 'is_search' => 'yes'));
-    $wpdb->insert($table, array('label' => 'Alquiler todo Febrero', 'field_id' => 'alq_all_feb', 'type' => 'text', 'is_search' => 'yes'));
-    $wpdb->insert($table, array('label' => 'Alquiler primera quincena de Enero', 'field_id' => 'first_half_jan', 'type' => 'text', 'is_search' => 'yes'));
-    $wpdb->insert($table, array('label' => 'Alquiler segunda quincena de Enero', 'field_id' => 'second_half_jan', 'type' => 'text', 'is_search' => 'yes'));
-    $wpdb->insert($table, array('label' => 'Alquiler primera quincena de Febrero', 'field_id' => 'first_half_feb', 'type' => 'text', 'is_search' => 'yes'));
-    $wpdb->insert($table, array('label' => 'Alquiler segunda quincena de Febrero', 'field_id' => 'second_half_feb', 'type' => 'text', 'is_search' => 'yes'));
 
     //Campos que son features pero pueden contener info o no estar dentro de las caracteristicas.
     // MUST DO -

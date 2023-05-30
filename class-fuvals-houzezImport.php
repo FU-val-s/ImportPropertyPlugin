@@ -90,7 +90,7 @@ class Fuvals_houzezImport_Tokko
 
   public function set_status()
   {
-    error_log("SET_STATUS FOR: " . $this->property['id'] . "\n");
+    error_log("SET_STATUS FOR: " . $this->property['reference_code'] . "\n");
     $prop = $this->property;
     $stat = 'publish';
     if (isset($prop['custom_tags'])) {
@@ -135,7 +135,7 @@ class Fuvals_houzezImport_Tokko
       $this->apiData,
       array(
         'json' => 'fichas.propiedades',
-        'id' => $id
+        'reference_code' => $id
       )
     );
     return $this->callApi($data);
@@ -195,12 +195,12 @@ class Fuvals_houzezImport_Tokko
     }
     return $this->callApi($data);
   }
-  public function process_property($ficha, $minval = false)
+  public function process_property($ficha, $minval = false, $update = true)
   {
     //$ficha is only one property - schema: Array[0][data]->data of the property
     global $wpdb;
     $table_houzez_data = $wpdb->prefix . "postmeta";
-    error_log("Procesando propiedad " . $ficha['id']);
+    error_log("Procesando propiedad " . $ficha['reference_code']);
     //$apiData = $this->property_details($ficha);
     error_log("Detalis propiedad fetched ");
     if (isset($ficha)) {
@@ -219,7 +219,7 @@ class Fuvals_houzezImport_Tokko
       }
       //error_log("Features: " . print_r($propertyFeatures, true));
       //Get property
-      $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $this->property['id'] . "'");
+      $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $this->property['reference_code'] . "'");
       //Check if property is active
       // if ($this->property['in_int'] == 'True' && (empty($this->property['in_esi']) || $this->property['in_esi'] == 'N')) {
       //   if ($minval && (empty($this->property['in_val']) || $this->property['in_val'] < $minval)) {
@@ -247,6 +247,7 @@ class Fuvals_houzezImport_Tokko
           }
         }
         error_log("La propiedad ya existe:" . $this->postId . ", hay que implementar update");
+        update_post_meta($this->postId, 'fave_property_id', $this->property['reference_code']);
         //Change title or description
         $data = array(
           'ID' => $this->postId,
@@ -255,12 +256,16 @@ class Fuvals_houzezImport_Tokko
         );
         wp_update_post($data);
         error_log("Actulizados título y desc:" . $this->postId);
+        if ( !$update ) {
+          error_log("Do not update, continue with next");
+          return;
+        }
       }
       // //Assign agent
       // error_log("Asignando agente: $this->agent");
       // $this->assign_agent();
       //PROPERTY ID
-      update_post_meta($this->postId, 'fave_property_id', $this->property['id']);
+      update_post_meta($this->postId, 'fave_property_id', $this->property['reference_code']);
       //PROPERTY TYPE
       $typeProp = $this->set_typeProp($ficha['type']);
       //error_log("TIPO: " . print_r($typeProp), true);
@@ -406,10 +411,9 @@ class Fuvals_houzezImport_Tokko
     update_post_meta($this->postId, 'fave_antiguedad', $this->property['age']);
     update_post_meta($this->postId, 'fave_orientacion', $this->property['orientation']);
     //update_post_meta($this->postId, 'fave_amueblado', $this->property['in_amu']);
-    update_post_meta($this->postId, 'fave_cant_pisos', $this->property['floors_amount']);
     update_post_meta($this->postId, 'fave_estado', $this->property['property_condition']);
     //update_post_meta($this->postId, 'fave_precio_alq', $this->property['in_vaa']);
-    update_post_meta($this->postId, 'fave_tipo_prop', $this->property['type']['name']);
+    //update_post_meta($this->postId, 'fave_tipo_prop', $this->property['type']['name']);
     // if (!empty($this->property['location'])) {
     //   update_post_meta($this->postId, 'fave_ubicacion', $this->property['location']['full_location']);
     // }
@@ -424,11 +428,11 @@ class Fuvals_houzezImport_Tokko
     // }
     //update_post_meta($this->postId, 'fave_emprendimiento', $this->property['in_edi']);
     //update_post_meta($this->postId, 'fave_cant_asc', $this->property['in_asc']);
-    update_post_meta($this->postId, 'fave_sup_cub', $this->property['roofed_surface'] . 'm²');
-    update_post_meta($this->postId, 'fave_sup_semi_cub', $this->property['semiroofed_surface'] . 'm²');
-    update_post_meta($this->postId, 'fave_nro_plant', $this->property['floors_amount']);
+    //update_post_meta($this->postId, 'fave_sup_cub', $this->property['roofed_surface'] . 'm²');
+    //update_post_meta($this->postId, 'fave_sup_semi_cub', $this->property['semiroofed_surface'] . 'm²');
+    update_post_meta($this->postId, 'fave_nro-plant', $this->property['floors_amount']);
     //update_post_meta($this->postId, 'fave_estado_of', $this->property['in_ale']);
-    update_post_meta($this->postId, 'fave_zonific', $this->property['zonification']);
+    //update_post_meta($this->postId, 'fave_zonific', $this->property['zonification']);
     // update_post_meta($this->postId, 'fave_fot', $this->property['in_fot']);
     // update_post_meta($this->postId, 'fave_cant_nav', $this->property['in_lin']);
     // update_post_meta($this->postId, 'fave_usos_limt', $this->property['in_uso']);
@@ -459,29 +463,29 @@ class Fuvals_houzezImport_Tokko
     error_log("LOAD RENT PRICES");
     foreach ($op['prices'] as $price) {
       if ($price['period'] == "1ra quincena de enero") {
-        update_post_meta($this->postId, 'fave_first_half_jan', $price['price']);
-        update_post_meta($this->postId, 'fave_first_half_jan_ref', $price['price']);
-        update_post_meta($this->postId, 'fave_property_sec_price', $price['price']);
+        update_post_meta($this->postId, 'fave_first-half-jan', $price['price']);
+        update_post_meta($this->postId, 'fave_first-half-jan-ref', $price['price']);
+        update_post_meta($this->postId, 'fave_property-sec-price', $price['price']);
       }
       if ($price['period'] == "2da quincena de enero") {
-        update_post_meta($this->postId, 'fave_second_half_jan', $price['price']);
-        update_post_meta($this->postId, 'fave_second_half_jan_ref', $price['price']);
+        update_post_meta($this->postId, 'fave_second-half-jan', $price['price']);
+        update_post_meta($this->postId, 'fave_second-half-jan-ref', $price['price']);
       }
       if ($price['period'] == "1ra quincena de febrero") {
-        update_post_meta($this->postId, 'fave_first_half_feb', $price['price']);
-        update_post_meta($this->postId, 'fave_first_half_feb_ref', $price['price']);
+        update_post_meta($this->postId, 'fave_first-half-feb', $price['price']);
+        update_post_meta($this->postId, 'fave_first-half-feb-ref', $price['price']);
       }
       if ($price['period'] == "2da quincena de febrero") {
-        update_post_meta($this->postId, 'fave_second_half_feb', $price['price']);
-        update_post_meta($this->postId, 'fave_second_half_feb_ref', $price['price']);
+        update_post_meta($this->postId, 'fave_second-half-feb', $price['price']);
+        update_post_meta($this->postId, 'fave_second-half-feb-ref', $price['price']);
       }
       if ($price['period'] == "Enero") {
-        update_post_meta($this->postId, 'fave_alq_all_jan', $price['price']);
-        update_post_meta($this->postId, 'fave_alq_all_jan_ref', $price['price']);
+        update_post_meta($this->postId, 'fave_alq-all-jan', $price['price']);
+        update_post_meta($this->postId, 'fave_alq-all-jan-ref', $price['price']);
       }
       if ($price['period'] == "Febrero") {
-        update_post_meta($this->postId, 'fave_alq_all_feb', $price['price']);
-        update_post_meta($this->postId, 'fave_alq_all_feb_ref', $price['price']);
+        update_post_meta($this->postId, 'fave_alq-all-feb', $price['price']);
+        update_post_meta($this->postId, 'fave_alq-all-feb-ref', $price['price']);
 
       }
     }
