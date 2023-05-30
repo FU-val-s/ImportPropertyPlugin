@@ -170,6 +170,10 @@ function import_houzez_properties()
   if (empty($fieldsQ)) {
     createNewCustomFields();
   }
+  $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'fave_superficie'");
+  if(empty($fieldsQ)) {
+    createAux();
+  }
 
   // Import object
   $houzezImport = new Fuvals_houzezImport_Tokko(0, false);
@@ -448,7 +452,12 @@ function dowloadPostImage($postId, $imgUrl, $type)
 
 
 //MUST DO - VERIFICACION PARA LOS CAMPOS QUE PUEDEN ESTAR EN FEATURES Y NO ES NECESARIO SETEARLOS
-
+function createAux(){
+  global $wpdb;
+  $table = $wpdb->prefix . "houzez_fields_builder";
+  $wpdb->insert($table, array('label' => 'Superficie', 'field_id' => 'superficie', 'type' => 'text', 'is_search' => 'no'));
+  $wpdb->insert($table, array('label' => 'Mostrar precio', 'field_id' => 'show-price', 'type' => 'text', 'is_search' => 'no'));
+}
 function createNewCustomFields()
 {
   global $wpdb;
