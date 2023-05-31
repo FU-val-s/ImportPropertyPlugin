@@ -579,7 +579,7 @@ class Fuvals_houzezImport_Tokko
     $search->TokkoSearch($auth, $data);
     //order_by=price&limit=20&order=desc&page=1&data='+JSON.stringify(data);
     // ORDER BY, LIMIT, ORDER
-    $search->do_search(10, 'deleted_at');
+    $search->do_search(3, 'deleted_at');
     $result = $search->get_properties();
     return $result;
   }

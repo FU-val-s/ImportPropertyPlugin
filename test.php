@@ -15,8 +15,9 @@ class Call {
       "operation_types" => [1, 2, 3],
       "property_types" => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
       "currency" => "ANY",
-      "filters" => []
+      "filters" => [],
     ];
+    $_REQUEST["page"] = 3;
     $data = json_decode(json_encode($data_arr));
     // CREATE PROPERTY SEARCH OBJECT
     $search = new TokkoSearch($this->auth);
@@ -24,7 +25,7 @@ class Call {
     //order_by=price&limit=20&order=desc&page=1&data='+JSON.stringify(data);
     // ORDER BY, LIMIT, ORDER
     //$search->do_search(500, 'deleted_at');
-    $search->do_search(10, 'deleted_at');
+    $search->do_search(3, 'deleted_at');
     date_default_timezone_set('UTC');
     print "ARRANCA \n";
     print_r($search->get_properties());
@@ -48,5 +49,5 @@ class Call {
 }
 
 $result = new Call;
-$result->prop();
+$result->api();
 ?>
