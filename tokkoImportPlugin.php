@@ -55,6 +55,21 @@ function houzezImp_activate()
   if (!wp_next_scheduled('cron_hook_tokko')) {
     wp_schedule_event(time(), 'daily', 'cron_hook_tokko');
   }
+  global $wpdb;
+  //LOAD FIELDS BUILDER ONLY ONCE
+  $table_houzez_fields_builds = $wpdb->prefix . "houzez_fields_builder";
+  $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'estado'");
+  if (empty($fieldsQ)) {
+    createCustomFields();
+  }
+  $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'alq-all-jan-ref'");
+  if (empty($fieldsQ)) {
+    createNewCustomFields();
+  }
+  $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'superficie'");
+  if(empty($fieldsQ)) {
+    createAux();
+  }
 }
 ;
 
@@ -140,18 +155,7 @@ function fuvals_get_last_properties($minval = false)
   error_log("------END DEBUG------");
 }
 /*Function executed by Cron*/
-function import_houzez_properties()
-{
-  //error_log("\nUPDATE OPTION: " . update_option( 'houzez_import_last_page', 0 ));
-  // $first = $args[0] !== null ? $args[0] : get_option( 'houzez_import_last_page', 0 );
-  // $pages = $args[1] !== null ? $args[1] : 1;
-  // $agent = $args[2] ? $args[2] : 0;
-  // $conciliateImages = $args[3] == 'false' ? false : true;
-  // $minval = $args[4] ? $args[4] : false;//valor minimo
-  // $filters = $args[5] ? $args[5] : [];
-
-  // error_log("FILTERS: ".print_r($filters, true));
-  // error_log("------START DEBUG------\n Desde: $first hasta $pages con agente: $agent --> OPERATION: $operation, Conciliate images: $conciliateImages");
+function import_houzez_properties() {
   error_log("------START DEBUG------\n");
   set_time_limit(0);
   ini_set('max_execution_time', '-1');
@@ -160,25 +164,9 @@ function import_houzez_properties()
   require_once(ABSPATH . 'wp-admin/includes/image.php');
   //database
   global $wpdb;
-  //LOAD FIELDS BUILDER ONLY ONCE
-  $table_houzez_fields_builds = $wpdb->prefix . "houzez_fields_builder";
   $table_houzez_data = $wpdb->prefix . "postmeta";
-  // TODO: pasar a activation
-  $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'estado'");
-  if (empty($fieldsQ)) {
-    createCustomFields();
-  }
-  $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'alq-all-jan-ref'");
-  if (empty($fieldsQ)) {
-    createNewCustomFields();
-  }
-  $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'superficie'");
-  if(empty($fieldsQ)) {
-    createAux();
-  }
-
-  // Import object
-  $houzezImport = new Fuvals_houzezImport_Tokko(0, false);
+    // Import object
+  $houzezImport = new Fuvals_houzezImport_Tokko(0, true);
   $result = true;
   while (!empty($result)) {
     if ( get_option('houzez_import_page_complete', false) ) {
@@ -200,7 +188,7 @@ function import_houzez_properties()
       $i += 1;
       //error_log(print_r($prop,true));
       if ( $process_last ) {
-        error_log("PROCESSIN UNFINISHED PAGE");
+        error_log("PROCESSING UNFINISHED PAGE Post");
         //check array until we find last unprocessed
         $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $prop['data']['reference_code'] . "'");
         if ( !empty($postIdQ) ) {
@@ -220,15 +208,15 @@ function import_houzez_properties()
         $process_last = false;
         //delete property
         error_log("Deletting property: ".$last_postIdQ);
-        wp_delete_post($last_postIdQ);
+        //wp_delete_post($last_postIdQ);
         //load again
         if ( $do_process_last ) {
           $last_prop = json_decode(json_encode($result[($i - 1)]), true);
           error_log("Adding last property: ".$last_prop['data']['reference_code']);
-          $houzezImport->process_property($last_prop['data'], 0, false);
+          $houzezImport->process_property($last_prop['data'], 0, true);
         }
       }
-      $houzezImport->process_property($prop['data'], 0, false);
+      $houzezImport->process_property($prop['data'], 0, true);
 
       error_log("DONE: property-" . $prop['data']['reference_code'] . "\n");
     }
@@ -327,36 +315,33 @@ function fuvalsHI_conciliateImages($postId, $propertyImg, $frontImgUrl)
       return false;
     }
     //Check image name
-    $file_name = basename($filepath);
-    if (str_contains($file_name, '_img_') || !file_exists($filepath)) {
+    if (!file_exists($filepath)) {
       error_log("FILE not found, reloading image");
       delete_post_meta($postId, 'fave_property_images', $fid);
       wp_delete_attachment($fid);
       continue;
     }
-    $propertyImages[$fid] = $file_name;
+    $file_name = basename($filepath);
+    $propertyImages[$fid] = explode('-', $file_name)[0];
   }
+  error_log("CONCILIATE ORIGINAL images in TOKKO: ".print_r($propertyImg, true));
   //error_log("IMAGES: ".print_r($propertyImages, true));
   //error_log( "CONCILIATE images ".print_r($propertyImages, true) );
   foreach ($propertyImg as $imgKey => $imgUrl) {
     $imgUrl = explode('?', $imgUrl)[0];
     $imgPath = pathinfo($imgUrl);
     $name = $imgPath['basename'];
+    $name_no_ext = explode('.', $name)[0];
     //If not in imgs reload
-    $imagesKey = array_search($name, $propertyImages);
-    //error_log("IMAGES processing: ".print_r($name, true));
-    if ($imagesKey !== false) {
-      unset($propertyImg[$imgKey]);
-      unset($propertyImages[$imagesKey]);
-    } else {
-      //Search for duplicated images
-      $imagesDupKey = array_search($imgPath['filename'] . '-1.' . $imgPath['extension'], $propertyImages);
-      if ($imagesDupKey !== false) {
+    foreach ($propertyImages as $fid => $propImage) {
+      if ( strpos($propImage, $name_no_ext) === 0 ) {
         unset($propertyImg[$imgKey]);
-        unset($propertyImages[$imagesDupKey]);
+        unset($propertyImages[$fid]);
       }
     }
   }
+  error_log("CONCILIATE images in POST: ".print_r($propertyImages, true));
+  error_log("CONCILIATE images in TOKKO: ".print_r($propertyImg, true));
   //Add images not found in property
   foreach ($propertyImg as $imgUrl) {
     error_log("CONCILIATE downloading image $imgUrl");

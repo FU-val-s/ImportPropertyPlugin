@@ -326,18 +326,18 @@ class Fuvals_houzezImport_Tokko
         loadImgProperty($this->postId, $imageList);
         //oldLoadImgProperty($this->postId, $this->property['img_princ'], $propertyImg, $this->property['in_fic']);
       } elseif ($this->conciliateImages) {
-        //if ( !fuvalsHI_conciliateThumb($this->postId, $this->property['img_princ']) ) {
-        error_log('ERRORES en thumb... reloading');
-        if (!loadThumbProperty($this->postId, $thumb, true)) {
-          error_log('ERRORES IN RELOADING THUMB');
+        if ( !fuvalsHI_conciliateThumb($this->postId, $thumb) ) {
+          error_log('ERRORES en thumb... reloading');
+          if (!loadThumbProperty($this->postId, $thumb, true)) {
+            error_log('ERRORES IN RELOADING THUMB');
+          }
         }
-        //}
-        //if ( !fuvalsHI_conciliateImages($this->postId, $propertyImg, $this->property['img_princ']) ) {
-        error_log('ERRORS in images... reloading');
-        if (!loadImgProperty($this->postId, $imageList, true)) {
-          error_log('ERRORS IN RELOADING IMGS');
+        if ( !fuvalsHI_conciliateImages($this->postId, $imageList, $thumb) ) {
+          error_log('ERRORS in images... reloading');
+          if (!loadImgProperty($this->postId, $imageList, true)) {
+            error_log('ERRORS IN RELOADING IMGS');
+          }
         }
-        //}
       }
       wp_update_post(['ID' => $this->postId]);
       error_log('TERMINAMOS DE LEVANTAR LOS DATOS E IMAGENES');
