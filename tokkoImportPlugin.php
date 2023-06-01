@@ -163,6 +163,7 @@ function import_houzez_properties()
   //LOAD FIELDS BUILDER ONLY ONCE
   $table_houzez_fields_builds = $wpdb->prefix . "houzez_fields_builder";
   $table_houzez_data = $wpdb->prefix . "postmeta";
+  // TODO: pasar a activation
   $fieldsQ = $wpdb->get_results("SELECT * FROM $table_houzez_fields_builds WHERE field_id = 'estado'");
   if (empty($fieldsQ)) {
     createCustomFields();
@@ -178,67 +179,71 @@ function import_houzez_properties()
 
   // Import object
   $houzezImport = new Fuvals_houzezImport_Tokko(0, false);
-  if ( get_option('houzez_import_page_complete', false) ) {
-    $process_last = false;
-    $_REQUEST["page"] = get_option('houzez_import_last_page', 0) + 1;
-    update_option('houzez_import_page_complete', false);
-  }
-  else {
-    $process_last = true;
-    $_REQUEST["page"] = get_option('houzez_import_last_page', 0);
-  }
-  update_option('houzez_import_last_page', $_REQUEST["page"]);
-  $result = $houzezImport->callApi();
-  error_log("PROCESSING PAGE:" . $_REQUEST["page"]);
-  $i = -1;
-  foreach ($result as $property) {
-    //convert object to array
-    $prop = json_decode(json_encode($property), true);
-    $i += 1;
-    //error_log(print_r($prop,true));
-    if ( $process_last ) {
-      error_log("PROCESSIN UNFINISHED PAGE");
-      //check array until we find last unprocessed
-      $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $prop['data']['reference_code'] . "'");
-      if ( !empty($postIdQ) ) {
-        $last_postIdQ = array_shift($postIdQ)->post_id;
-        //Si no es el último seguimos
-        if ( isset( $result[($i + 1)] ) ) {
-          error_log("Skipping property: ".$prop['data']['reference_code']);
-          continue;
+  $result = true;
+  while (!empty($result)) {
+    if ( get_option('houzez_import_page_complete', false) ) {
+      $process_last = false;
+      $_REQUEST["page"] = get_option('houzez_import_last_page', 0) + 1;
+      update_option('houzez_import_page_complete', false);
+    }
+    else {
+      $process_last = true;
+      $_REQUEST["page"] = get_option('houzez_import_last_page', 0);
+    }
+    update_option('houzez_import_last_page', $_REQUEST["page"]);
+    $result = $houzezImport->callApi();
+    error_log("PROCESSING PAGE:" . $_REQUEST["page"]);
+    $i = -1;
+    foreach ($result as $property) {
+      //convert object to array
+      $prop = json_decode(json_encode($property), true);
+      $i += 1;
+      //error_log(print_r($prop,true));
+      if ( $process_last ) {
+        error_log("PROCESSIN UNFINISHED PAGE");
+        //check array until we find last unprocessed
+        $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $prop['data']['reference_code'] . "'");
+        if ( !empty($postIdQ) ) {
+          $last_postIdQ = array_shift($postIdQ)->post_id;
+          //Si no es el último seguimos
+          if ( isset( $result[($i + 1)] ) ) {
+            error_log("Skipping property: ".$prop['data']['reference_code']);
+            continue;
+          }
+          else {
+            $do_process_last = false;
+          }
         }
         else {
-          $do_process_last = false;
+          $do_process_last = true;
+        }
+        $process_last = false;
+        //delete property
+        error_log("Deletting property: ".$last_postIdQ);
+        wp_delete_post($last_postIdQ);
+        //load again
+        if ( $do_process_last ) {
+          $last_prop = json_decode(json_encode($result[($i - 1)]), true);
+          error_log("Adding last property: ".$last_prop['data']['reference_code']);
+          $houzezImport->process_property($last_prop['data'], 0, false);
         }
       }
-      else {
-        $do_process_last = true;
-      }
-      $process_last = false;
-      //delete property
-      error_log("Deletting property: ".$last_postIdQ);
-      wp_delete_post($last_postIdQ);
-      //load again
-      if ( $do_process_last ) {
-        $last_prop = json_decode(json_encode($result[($i - 1)]), true);
-        error_log("Adding last property: ".$last_prop['data']['reference_code']);
-        $houzezImport->process_property($last_prop['data'], 0, false);
-      }
-    }
-    $houzezImport->process_property($prop['data'], 0, false);
+      $houzezImport->process_property($prop['data'], 0, false);
 
-    error_log("DONE: property-" . $prop['data']['reference_code'] . "\n");
+      error_log("DONE: property-" . $prop['data']['reference_code'] . "\n");
+    }
+    update_option('houzez_import_page_complete', true);
+    error_log("END PROCESSING PAGE:" . $_REQUEST["page"]);
+    // for ($i = $first; $i < $limit; $i++) {
+    //   $result = $houzezImport->get_valued_properties($i, $filters);
+    //   error_log("\n\nProcesando PÁGINA " . get_option( 'houzez_import_last_page', 0 )." de $limit");
+    //   error_log("\nFICHAS PÁGINA " . print_r($result['fichas'], true));
+    //   foreach ($result['fichas'] as $ficha) {
+    //     $houzezImport->process_property($ficha, $minval);
+    //   }
+    //   update_option('houzez_import_last_page', $i+1);
+    // }
   }
-  update_option('houzez_import_page_complete', true);
-  // for ($i = $first; $i < $limit; $i++) {
-  //   $result = $houzezImport->get_valued_properties($i, $filters);
-  //   error_log("\n\nProcesando PÁGINA " . get_option( 'houzez_import_last_page', 0 )." de $limit");
-  //   error_log("\nFICHAS PÁGINA " . print_r($result['fichas'], true));
-  //   foreach ($result['fichas'] as $ficha) {
-  //     $houzezImport->process_property($ficha, $minval);
-  //   }
-  //   update_option('houzez_import_last_page', $i+1);
-  // }
   error_log("------END DEBUG------");
 }
 
