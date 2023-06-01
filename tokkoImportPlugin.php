@@ -185,11 +185,11 @@ function import_houzez_properties()
   }
   else {
     $process_last = true;
-    $_REQUEST["page"] = get_option('houzez_import_last_page', 0)
+    $_REQUEST["page"] = get_option('houzez_import_last_page', 0);
   }
   update_option('houzez_import_last_page', $_REQUEST["page"]);
   $result = $houzezImport->callApi();
-  //error_log("RESULT:" . print_r($result,true));
+  error_log("PROCESSING PAGE:" . $_REQUEST["page"]);
   $i = -1;
   foreach ($result as $property) {
     //convert object to array
@@ -201,7 +201,7 @@ function import_houzez_properties()
       //check array until we find last unprocessed
       $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $prop['data']['reference_code'] . "'");
       if ( !empty($postIdQ) ) {
-        $last_postIdQ = $postIdQ;
+        $last_postIdQ = array_shift($postIdQ)->post_id;
         //Si no es el último seguimos
         if ( isset( $result[($i + 1)] ) ) {
           error_log("Skipping property: ".$prop['data']['reference_code']);
@@ -216,6 +216,7 @@ function import_houzez_properties()
       }
       $process_last = false;
       //delete property
+      error_log("Deletting property: ".$last_postIdQ);
       wp_delete_post($last_postIdQ);
       //load again
       if ( $do_process_last ) {

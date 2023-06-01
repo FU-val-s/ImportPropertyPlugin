@@ -319,15 +319,16 @@ class Fuvals_houzezImport_Tokko
       error_log("Create property features updated");
       //LOAD IMAGES PACK FOR POST
       $imageList = $this->getImageUrl($propertyImg);
+      $thumb = array_shift($imageList);
       //Do not update for now
       if ($new) {
-        loadThumbProperty($this->postId, $propertyImg['0']['image']);
+        loadThumbProperty($this->postId, $thumb);
         loadImgProperty($this->postId, $imageList);
         //oldLoadImgProperty($this->postId, $this->property['img_princ'], $propertyImg, $this->property['in_fic']);
       } elseif ($this->conciliateImages) {
         //if ( !fuvalsHI_conciliateThumb($this->postId, $this->property['img_princ']) ) {
         error_log('ERRORES en thumb... reloading');
-        if (!loadThumbProperty($this->postId, $propertyImg['0']['image'], true)) {
+        if (!loadThumbProperty($this->postId, $thumb, true)) {
           error_log('ERRORES IN RELOADING THUMB');
         }
         //}
