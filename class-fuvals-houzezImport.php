@@ -252,7 +252,7 @@ class Fuvals_houzezImport_Tokko
         //Change title or description
         $data = array(
           'ID' => $this->postId,
-          'post_title' => $ficha['publication_title'],
+          'post_title' => $ficha['fake_address'],
           'post_content' => html_entity_decode($ficha['description']),
         );
         wp_update_post($data);
