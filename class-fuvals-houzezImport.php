@@ -292,7 +292,12 @@ class Fuvals_houzezImport_Tokko
       //Add video
       // if (!empty($this->property['videos']))
       //   update_post_meta($this->postId, 'fave_video_url', $this->property['in_vid']);
-      update_post_meta($this->postId, 'fave_property_size', $ficha['roofed_surface']);
+      if ($ficha['total_surface'] != '0.00') {
+        update_post_meta($this->postId, 'fave_property_size', $ficha['total_surface']);
+      }
+      else {
+        update_post_meta($this->postId, 'fave_property_size', $ficha['roofed_surface']);
+      }
       update_post_meta($this->postId, 'fave_property_land', $ficha['total_surface']);
       update_post_meta($this->postId, 'fave_property_land_postfix', $ficha['surface_measurement']);
       update_post_meta($this->postId, 'fave_property_size_prefix', $ficha['surface_measurement']);

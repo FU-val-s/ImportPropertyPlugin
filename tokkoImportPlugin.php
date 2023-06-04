@@ -3,7 +3,7 @@
  * Plugin Name: Tokko Import Plugin
  * Plugin URI:
  * Description: Este plugin importa datos llamando a la API de Tokko y genera las propiedades.
- * Version: 1.5
+ * Version: 1.5.1
  * Author: FUvalS.uy
  * Author URI: https://fuvals.uy
  * Requires at least:
@@ -168,6 +168,7 @@ function import_houzez_properties() {
     // Import object
   $houzezImport = new Fuvals_houzezImport_Tokko(0, true);
   $result = true;
+  $_REQUEST["limit"] = 3; 
   while (!empty($result)) {
     if ( get_option('houzez_import_page_complete', false) ) {
       $process_last = false;
@@ -324,7 +325,8 @@ function fuvalsHI_conciliateImages($postId, $propertyImg, $frontImgUrl)
     $file_name = basename($filepath);
     $propertyImages[$fid] = explode('-', $file_name)[0];
   }
-  error_log("CONCILIATE ORIGINAL images in TOKKO: ".print_r($propertyImg, true));
+  //error_log("CONCILIATE ORIGINAL images in TOKKO: ".print_r($propertyImg, true));
+  //error_log("CONCILIATE ORIGINAL images in POST: ".print_r($propertyImages, true));
   //error_log("IMAGES: ".print_r($propertyImages, true));
   //error_log( "CONCILIATE images ".print_r($propertyImages, true) );
   foreach ($propertyImg as $imgKey => $imgUrl) {
@@ -340,8 +342,8 @@ function fuvalsHI_conciliateImages($postId, $propertyImg, $frontImgUrl)
       }
     }
   }
-  error_log("CONCILIATE images in POST: ".print_r($propertyImages, true));
-  error_log("CONCILIATE images in TOKKO: ".print_r($propertyImg, true));
+  //error_log("CONCILIATE images in TOKKO: ".print_r($propertyImg, true));
+  //error_log("CONCILIATE images in POST: ".print_r($propertyImages, true));
   //Add images not found in property
   foreach ($propertyImg as $imgUrl) {
     error_log("CONCILIATE downloading image $imgUrl");
