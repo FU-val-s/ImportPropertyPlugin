@@ -29,6 +29,7 @@ add_action('cron_fuvals_houzez_conciliate', 'fuvals_conciliate_properties');
 //Get classes
 require plugin_dir_path(__FILE__) . '/class-fuvals-wp-admin-form.php';
 require plugin_dir_path(__FILE__) . '/class-fuvals-houzezImport.php';
+require plugin_dir_path(__FILE__) . '/api.php';
 
 //Call wp-admin-form class
 function run_fuvals_wp_admin_form()
@@ -120,6 +121,45 @@ function fuvals_get_last_properties($minval = false)
   require_once(ABSPATH . 'wp-admin/includes/image.php');
   $houzezImport = new Fuvals_houzezImport_Tokko(0, true);
   $next = true;
+  $data_arr = [
+    "current_localization_id"=>0,
+    "current_localization_type"=>"country",
+    "price_from"=>0,
+    "price_to"=>999999999,
+    "operation_types"=>[1,2,3],
+    "property_types"=>[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],
+    "currency"=>"ANY",
+    "filters"=>[]
+  ];
+  $data = json_decode(json_encode($data_arr));
+  $auth = new TokkoAuth($houzezImport->code);
+  // CREATE PROPERTY SEARCH OBJECT
+  $search = new TokkoSearch($auth);
+  $search->TokkoSearch($auth, $data);
+  //order_by=price&limit=20&order=desc&page=1&data='+JSON.stringify(data);
+  // ORDER BY, LIMIT, ORDER
+  $search->do_search(20, 'deleted_at');
+  date_default_timezone_set('UTC');
+  foreach ( $search->get_properties() as $propiedad_obj ) {
+    //check only last hour
+    $propiedad = $propiedad_obj->data;
+    //print_r($propiedad);
+    //print "\n Property TIME: ".strtotime( $propiedad->deleted_at )." \n\n";
+    if ( strtotime( $propiedad->deleted_at ) < strtotime( $from.' hour' ) ) {
+      error_log('No hay mas propiedades para importar: '.$propiedad->deleted_at);
+      break;
+    }
+    else {
+      error_log('Propiedad para importar: '.$propiedad);
+      foreach ($propiedad->custom_tags as $tag) {
+        if ( $tag->id == 15445 ){
+          continue(2);
+        }
+      }
+      error_log('Importing tokko property: '.$propiedad->id);
+    }
+  }
+  exit();
   $i = 0;
   while ($next) {
     $result = $houzezImport->get_last_properties($i, $minval);

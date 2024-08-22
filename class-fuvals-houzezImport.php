@@ -8,9 +8,10 @@ class Fuvals_houzezImport_Tokko
   public int $postId;
   //Connection data for tokko
   public $apiUser = 'TokkoTest'; // for tokko?
-  public $apiKey = 'b87fe1d3b55263138083c53238333311c8046c81';
+  public $apiKey = '796d064d5e443dd61210bd40820abca642c5a5b2';
   // FIN - DATOS INMOBILIARIA //
   public $apiUrl = 'http://tokkobroker.com/api/v1/webcontact/?key=';
+  public $apiKeyTest = '5940ea45eb7cfb55228bec0b958ea9c0be151757';
   public array $apiData;
   public $property;
   //CONSTRUCT
