@@ -20,11 +20,12 @@ ini_set("error_reporting", E_ALL & ~E_DEPRECATED);
 //Activate plugin
 register_activation_hook(__FILE__, 'houzezImp_activate');
 //Add action to the created cron job hook - Crear una funcion para esto.
-add_action('cron_hook_tokko', 'import_houzez_properties');
+add_action('cron_hook_tokko_import_all', 'import_houzez_properties');
 //Plugin activation hook
 add_action('cron_fuvals_operations', 'fuvals_run_operation');
 //Update function
 add_action('cron_fuvals_houzez_update', 'fuvals_get_last_properties');
+add_action('fuvals_cron_check', 'fuvals_cron_check');
 add_action('cron_fuvals_houzez_conciliate', 'fuvals_conciliate_properties');
 //Get classes
 require plugin_dir_path(__FILE__) . '/class-fuvals-wp-admin-form.php';
@@ -44,10 +45,10 @@ function houzezImp_activate()
   //add_option( 'Activated_Plugin_Houzez', true );
   // register the setting
   if (get_option('houzez_import_last_page', false)) {
-    register_setting('houzez_import_last_page');
+    register_setting('options','houzez_import_last_page');
   }
   if (get_option('houzez_import_page_complete', false)) {
-    register_setting( 'houzez_import_page_complete' );
+    register_setting( 'options', 'houzez_import_page_complete' );
   }
   update_option('houzez_import_last_page', 0);
   update_option('houzez_import_page_complete', true);
@@ -72,8 +73,14 @@ function houzezImp_activate()
     createAux();
   }
 }
-;
 
+add_action( 'wp', 'fuvals_cron_check' );
+function fuvals_cron_check() {
+  if (!wp_next_scheduled('cron_fuvals_houzez_update')) {
+    error_log("FUVALS loaded CRON ADD");
+    wp_schedule_event(time(), 'fifteen_minutes', 'cron_fuvals_houzez_update');
+  }
+}
 //--MUST DO - CREATE A DESACTIVATION FUNCTION
 //function houzezImp_desactivate () {}
 
@@ -114,84 +121,44 @@ function fuvals_get_last_properties($minval = false)
 {
   set_time_limit(0);
   ini_set('max_execution_time', '-1');
-  $last_update = get_option('houzez_import_last_date', '2022-12-14 06:11:00');
+  $from = -15;
+  date_default_timezone_set('UTC');
+  $last_update = get_option('houzez_import_last_date', '2024-09-23 18:11:00');
   error_log("------ min " . print_r($minval, true) . " - START UPDATE - $last_update ------\n");
   require_once(ABSPATH . 'wp-admin/includes/file.php');
   require_once(ABSPATH . 'wp-admin/includes/media.php');
   require_once(ABSPATH . 'wp-admin/includes/image.php');
   $houzezImport = new Fuvals_houzezImport_Tokko(0, true);
-  $next = true;
-  $data_arr = [
-    "current_localization_id"=>0,
-    "current_localization_type"=>"country",
-    "price_from"=>0,
-    "price_to"=>999999999,
-    "operation_types"=>[1,2,3],
-    "property_types"=>[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],
-    "currency"=>"ANY",
-    "filters"=>[]
-  ];
-  $data = json_decode(json_encode($data_arr));
-  $auth = new TokkoAuth($houzezImport->code);
-  // CREATE PROPERTY SEARCH OBJECT
-  $search = new TokkoSearch($auth);
-  $search->TokkoSearch($auth, $data);
-  //order_by=price&limit=20&order=desc&page=1&data='+JSON.stringify(data);
-  // ORDER BY, LIMIT, ORDER
-  $search->do_search(20, 'deleted_at');
+  //set Tokko timezone
   date_default_timezone_set('UTC');
-  foreach ( $search->get_properties() as $propiedad_obj ) {
-    //check only last hour
-    $propiedad = $propiedad_obj->data;
-    //print_r($propiedad);
-    //print "\n Property TIME: ".strtotime( $propiedad->deleted_at )." \n\n";
-    if ( strtotime( $propiedad->deleted_at ) < strtotime( $from.' hour' ) ) {
-      error_log('No hay mas propiedades para importar: '.$propiedad->deleted_at);
-      break;
-    }
-    else {
-      error_log('Propiedad para importar: '.$propiedad);
-      foreach ($propiedad->custom_tags as $tag) {
-        if ( $tag->id == 15445 ){
-          continue(2);
-        }
+  $last = false;
+  $page = 1;
+  while ( !$last ) {
+    $last_properties = $houzezImport->get_last_properties($page);
+    error_log( "LAST PROPS PAGE: ".$page );
+    foreach ( array_reverse($last_properties) as $propiedad ) {
+      //check only last hour
+      //print_r($propiedad);
+      error_log("\n Property TIME: ".strtotime( $propiedad->deleted_at )." \n".strtotime( $from.' minutes' )."\n");
+      if ( strtotime( $propiedad->deleted_at ) <= strtotime( $last_update ) ) {
+        error_log('No hay mas propiedades para importar: '.$propiedad->deleted_at);
+        $last = true;
       }
-      error_log('Importing tokko property: '.$propiedad->id);
-    }
-  }
-  exit();
-  $i = 0;
-  while ($next) {
-    $result = $houzezImport->get_last_properties($i, $minval);
-    $properties = $result['resultado']['fichas'];
-    error_log("\nFICHAS PÁGINA \n" . print_r($result['fichas'], true));
-    // process properties
-    foreach (array_reverse($properties) as $property) {
-      if (!isset($property['fechaac_inmueble']) || empty($property['fechaac_inmueble'])) {
-        //Check if property is already loaded
-        global $wpdb;
-        $table_houzez_data = $wpdb->prefix . "postmeta";
-        $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $property['in_fic'] . "'");
-        if (empty($postIdQ)) {
-          error_log("Updating property: " . $property['in_fic'] . " - date: " . $property['fechaac_inmueble']);
-          $houzezImport->process_property($property['in_fic']); //, $minval);
-        } else {
-          error_log("Skipping new property: " . $property['in_fic']);
-        }
-      } elseif ($property['fechaac_inmueble'] > $last_update) {
-        error_log("Updating property: " . $property['in_fic'] . " - date: " . $property['fechaac_inmueble']);
-        $houzezImport->process_property($property['in_fic']); //, $minval);
-        //Only update for first page
-        if ($i == 0)
-          update_option('houzez_import_last_date', $property['fechaac_inmueble']);
-      } else {
-        $next = false;
-        error_log("Skipping property processed: " . $property['in_fic'] . " - date: " . $property['fechaac_inmueble']);
+      else {
+        //error_log('Propiedad para importar: '.$propiedad);
+        /*foreach ($propiedad->custom_tags as $tag) {
+          if ( $tag->id == 15445 ){
+            continue(2);
+          }
+        }*/
+        error_log('Importing tokko property: '.$propiedad->id);
+        //Process Property
+        $houzezImport->process_property(json_decode(json_encode($propiedad), true)); //, $minval);
+        update_option('houzez_import_last_date', $propiedad->deleted_at);
       }
     }
-    $i++;
+    $page++;
   }
-  //Get properties
   error_log("------END DEBUG------");
 }
 /*Function executed by Cron*/
@@ -220,7 +187,7 @@ function import_houzez_properties() {
       $_REQUEST["page"] = get_option('houzez_import_last_page', 0);
     }
     update_option('houzez_import_last_page', $_REQUEST["page"]);
-    $result = $houzezImport->callApi();
+    $result = $houzezImport->get_last_properties();
     error_log("PROCESSING PAGE:" . $_REQUEST["page"]);
     $i = -1;
     foreach ($result as $property) {
@@ -231,12 +198,12 @@ function import_houzez_properties() {
       if ( $process_last ) {
         error_log("PROCESSING UNFINISHED PAGE Post");
         //check array until we find last unprocessed
-        $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $prop['data']['reference_code'] . "'");
+        $postIdQ = $wpdb->get_results("SELECT post_id FROM $table_houzez_data WHERE meta_key = 'fave_property_id' and meta_value = '" . $prop['id'] . "'");
         if ( !empty($postIdQ) ) {
           $last_postIdQ = array_shift($postIdQ)->post_id;
           //Si no es el último seguimos
           if ( isset( $result[($i + 1)] ) ) {
-            error_log("Skipping property: ".$prop['data']['reference_code']);
+            error_log("Skipping property: ".$prop['id']);
             continue;
           }
           else {
@@ -253,13 +220,13 @@ function import_houzez_properties() {
         //load again
         if ( $do_process_last ) {
           $last_prop = json_decode(json_encode($result[($i - 1)]), true);
-          error_log("Adding last property: ".$last_prop['data']['reference_code']);
-          $houzezImport->process_property($last_prop['data'], 0, true);
+          error_log("Adding last property: ".$last_prop['id']);
+          $houzezImport->process_property($last_prop, 0, true);
         }
       }
-      $houzezImport->process_property($prop['data'], 0, true);
-
-      error_log("DONE: property-" . $prop['data']['reference_code'] . "\n");
+      $houzezImport->process_property($prop, 0, true);
+      error_log("DONE: property-" . $prop['id'] . "\n");
+      exit();
     }
     update_option('houzez_import_page_complete', true);
     error_log("END PROCESSING PAGE:" . $_REQUEST["page"]);
@@ -538,12 +505,13 @@ function createNewCustomFields()
   global $wpdb;
   $table = $wpdb->prefix . "houzez_fields_builder";
   //Ref-fields for prices
-  $wpdb->insert($table, array('label' => 'Alquiler todo Enero - Ref', 'field_id' => 'alq-all-jan-ref', 'type' => 'text', 'is_search' => 'no'));
+  /*$wpdb->insert($table, array('label' => 'Alquiler todo Enero - Ref', 'field_id' => 'alq-all-jan-ref', 'type' => 'text', 'is_search' => 'no'));
   $wpdb->insert($table, array('label' => 'Alquiler todo Febrero - Ref', 'field_id' => 'alq-all-feb-ref', 'type' => 'text', 'is_search' => 'no'));
   $wpdb->insert($table, array('label' => 'Alquiler primera quincena de Enero - Ref', 'field_id' => 'first-half-jan-ref', 'type' => 'text', 'is_search' => 'no'));
   $wpdb->insert($table, array('label' => 'Alquiler segunda quincena de Enero - Ref', 'field_id' => 'second-half-jan-ref', 'type' => 'text', 'is_search' => 'no'));
   $wpdb->insert($table, array('label' => 'Alquiler primera quincena de Febrero - Ref', 'field_id' => 'first-half-feb-ref', 'type' => 'text', 'is_search' => 'no'));
   $wpdb->insert($table, array('label' => 'Alquiler segunda quincena de Febrero - Ref', 'field_id' => 'second-half-feb-ref', 'type' => 'text', 'is_search' => 'no'));
+  */
   //PERIOD OF RENT FIELDS
   $wpdb->insert($table, array('label' => 'Alquiler todo Enero', 'field_id' => 'alq_all_jan', 'type' => 'text', 'is_search' => 'yes'));
   $wpdb->insert($table, array('label' => 'Alquiler todo Febrero', 'field_id' => 'alq_all_feb', 'type' => 'text', 'is_search' => 'yes'));

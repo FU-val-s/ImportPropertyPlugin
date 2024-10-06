@@ -21,8 +21,8 @@ class Fuvals_Admin_Form
     public function add_menu_page()
     {
         add_menu_page(
-            esc_html__('Mieres sync', 'fuvals-admin'),
-            esc_html__('Mieres sync', 'fuvals-admin'),
+            esc_html__('Tokko sync', 'fuvals-admin'),
+            esc_html__('Tokko sync', 'fuvals-admin'),
             'manage_options',
             $this->get_id(),
             array(&$this, 'load_view'),
@@ -81,8 +81,8 @@ class Fuvals_Admin_Form
         }
         return $output;
     }
-    private function view1_data()
-    {
+    //DATA VIEW
+    private function view1_data() {
         $services_args = array(
             'post_type'        => 'any',
             'numberposts'      => 1,
@@ -93,6 +93,7 @@ class Fuvals_Admin_Form
         $args['posts'] = $blog_posts;
         return $args;
     }
+    // SUBMIT
     public function submit_property_update() {
       $nonce = sanitize_text_field($_POST[$this->get_nonce_key()]);
       $action = sanitize_text_field($_POST['action']);
@@ -104,14 +105,16 @@ class Fuvals_Admin_Form
         print 'You can\'t manage options';
         exit;
       }*/
-      $property_id = (int) $_POST['property_id'];
+      $property_id = $_POST['property_id'];
       error_log("\nUPDATING PROPERTY VALIDATE: $property_id");
-      if ( !is_null($property_id) && $property_id > 0 ) {
+      if ( !empty($property_id) ) {
         set_time_limit(0);
         error_log("\nUPDATING PROPERTY: $property_id" );
-        $houzezImport = new Fuvals_houzezImport(0, true);
+        $houzezImport = new Fuvals_houzezImport_Tokko(0, true);
         error_log("\nOBJECT OK: $property_id" );
-        $houzezImport->process_property($property_id);
+        $property = $houzezImport->property_details($property_id);
+        error_log("PROP DETAILS: ".print_r($property, true));
+        $houzezImport->process_property(json_decode(json_encode($property), true));
         //Redirect
         error_log("\nPROPERTY UPDATing redirecting: $property_id");
       }

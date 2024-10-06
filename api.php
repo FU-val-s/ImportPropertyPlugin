@@ -1,7 +1,6 @@
 <?php
 
-class TokkoWebContact
-{
+class TokkoWebContact {
    var $auth = null;
    var $BASE_SEND_URL = "http://tokkobroker.com/api/v1/webcontact/?key=";
    var $data = null;
@@ -1206,11 +1205,12 @@ class TokkoProperty
 {
    var $data = null;
    var $BASE_URL = "http://www.tokkobroker.com/api/v1/property/";
-   function TokkoProperty($get_type, $data, $auth=null){
+   function __construct($get_type, $data, $auth=null){
        if ($get_type == 'object'){
            $this->data = $data;
        }
        try {
+        error_log('API TokkoProperty GET REF CODE: '.$data);
            if ($get_type == 'id'){
                $url = $this->BASE_URL . $data . "/?format=json&key=". $auth->key ."&lang=".$auth->get_language();
 
@@ -1223,7 +1223,7 @@ class TokkoProperty
            }
            if ($get_type == 'reference_code'){
                $url = $this->BASE_URL . "?format=json&reference_code=". urlencode($data) ."&key=". $auth->key ."&lang=".$auth->get_language();
-
+                error_log('TokkoProperty GET REF CODE: '.$url);
                $cp = curl_init();
                curl_setopt($cp, CURLOPT_RETURNTRANSFER, 1);
                curl_setopt($cp, CURLOPT_URL, $url);
@@ -1684,6 +1684,7 @@ class TokkoSearch
                 if (!$order){ $order = $this->get_search_order();}
 
                 $url = $this->BASE_SEARCH_URL . "order_by=" . $order_by ."&order=". $order ."&format=". $this->results_format ."&key=". $this->auth->key ."&lang=". $this->auth->get_language() ."&limit=". $limit ."&offset=" . $this->get_search_offset() . "&data=" . json_encode($this->search_data);
+                echo "API SEND: ".print_r($url, true);
                 $url = str_replace(" ","%20",$url);
 
                 $cp = curl_init();
@@ -1691,6 +1692,7 @@ class TokkoSearch
                 curl_setopt($cp, CURLOPT_URL, $url);
                 curl_setopt($cp, CURLOPT_TIMEOUT, 60);
                 $this->search_results = json_decode(curl_exec($cp));
+                //print('API SEARCH RESULTS:'.print_r($this->search_results, true));
                 curl_close($cp);
             } catch (Exception $e) {
                 $this->search_results = null;
@@ -1721,7 +1723,7 @@ class TokkoSearch
             return $properties;
         }else{
             foreach ($this->search_results->objects as $prop) {
-                array_push($properties, new TokkoProperty('object', $prop));
+                array_push($properties, $prop);//new TokkoProperty('object', $prop));
             }
             return $properties;
         }
